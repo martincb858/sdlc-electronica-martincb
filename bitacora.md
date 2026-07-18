@@ -54,3 +54,19 @@ El código fue verificado localmente utilizando las herramientas del entorno de 
 ### Prompts utilizados
 1. **Aprendizaje de cada principio:** Se solicitaron explicaciones de cada principio para poder comprenderlos de mejor forma, con ejemplos practicos ya en codigo.
 2. **Solicitud de codigos de ejemplo:** Al ser temas desconocidos empece por ejemplos que fui desglozando con ayuida de la IA y posteriormente fui trabajando personalmente los codigos despues de comprender mejor las estructuras.
+
+
+## [2026-07-18] — Entrada 5:  SOLID completo: I y D (3 h)
+
+###  Lo que aprendí / Implementaciones
+1. **Aprendizaje de ISP:** El principio ISP fue algo interesante porque es algo que siento que puede suceder mucho, a veces declaramos cosas o definimos acciones que haran algunas clases sin necesidad y hacer un codigo que no tengas que hacer esto necesariamente es muy conveniente.
+2. **Aprendizaje de DIP:** El principio DIP al igual que el ISP fue algo muy interesante de aplicar porque hacer que estas partes importantes de nuestro sistema sean por asi decirlo "independientes" en lo personal creo que es algo muy conveniente porque en el caso de que algo suceda en alguno de los dos deje de funcionar no afectaria directamente al otro y ademas de que tambien aplica un poco de otros pincipios como el OCP.
+
+###  Notas de Verificación de Calidad
+El código fue verificado localmente utilizando las herramientas del entorno de QA:
+* **Pytest:** Al inicio me ayudo a detectar problemas en las direcciones con los imports y algunos errores de sintaxis pero posteriormente nos dio una validacion exitosa sin ninguna obseervacion.
+
+### Prompts utilizados
+1. **Aprendizaje de cada principio:** Se solicitaron explicaciones de cada principio para poder comprenderlos de mejor forma, con ejemplos practicos ya en codigo.
+2. **Solicitud de codigos de ejemplo:** Al ser temas desconocidos empece por ejemplos que fui desglozando con ayuida de la IA y posteriormente fui trabajando personalmente los codigos despues de comprender mejor las estructuras.
+33. **Ayuda con errores de direcciones y test:** Al momento de hacer los test tuve errores con las direcciones de los archivos y mediante esto pude aprender porque sucedia ese error y aprendi una forma nueva de hacer los test para que pueda tener contexto de todas las carpetas del proyecto

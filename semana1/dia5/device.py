@@ -9,7 +9,7 @@ class UartDevice:
     Recibe su configuración y estrategia de parseo por inyección de dependencias (DIP).
     """
 
-    def __init__(self, config: UartConfig, parser: MessageParser):
+    def __init__(self, config: UartConfig, parser: MessageParser) -> None:
         """Inicializa el dispositivo inyectando la configuración y el parser."""
         self.config = config
         self.parser = parser
@@ -18,15 +18,13 @@ class UartDevice:
     def connect(self) -> None:
         """Abre la conexión serial utilizando los parámetros de self.config."""
         if self._is_connected:
-            raise RuntimeError("El dispositivo UART ya se encuentra conectado.")      
+            raise RuntimeError("El dispositivo UART ya se encuentra conectado.")
         self._is_connected = True
-
 
     def disconnect(self) -> None:
         """Cierra la conexión serial de forma segura."""
         if self._is_connected:
             self._is_connected = False
-
 
     def read_and_parse(self, raw_data: bytes) -> Optional[Dict[str, Any]]:
         """
@@ -34,11 +32,12 @@ class UartDevice:
         Levanta RuntimeError si el dispositivo no está conectado.
         """
         if not self._is_connected:
-            raise RuntimeError("Operación denegada: El dispositivo UART no está conectado.")
+            raise RuntimeError(
+                "Operación denegada: El dispositivo UART no está conectado."
+            )
 
         # Delega la validación y el parseo a la abstracción
         if self.parser.can_parse(raw_data):
             return self.parser.parse(raw_data)
         else:
-           
             return None

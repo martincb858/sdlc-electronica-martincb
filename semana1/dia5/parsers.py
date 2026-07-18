@@ -94,7 +94,7 @@ class NMEAParser(MessageParser):
         parts = text.split(',')
         
         # Estructura base. Si no es GPGGA, devolvemos un diccionario genérico.
-        result = {
+        result: Dict[str, Any] = {
             "protocol": "NMEA",
             "type": parts[0].replace('$', '')
         }
@@ -113,7 +113,7 @@ class NMEAParser(MessageParser):
 
 class CanParser(MessageParser):
     """
-    Implementación de MessageParser para tramas CAN (Controller Area Network) simplificadas.
+    Implementación de MessageParser para tramas CAN simplificadas.
     Estructura asumida: ID (2 bytes) + DLC (1 byte) + Payload (DLC bytes).
     """
     

@@ -69,4 +69,21 @@ El código fue verificado localmente utilizando las herramientas del entorno de 
 ### Prompts utilizados
 1. **Aprendizaje de cada principio:** Se solicitaron explicaciones de cada principio para poder comprenderlos de mejor forma, con ejemplos practicos ya en codigo.
 2. **Solicitud de codigos de ejemplo:** Al ser temas desconocidos empece por ejemplos que fui desglozando con ayuida de la IA y posteriormente fui trabajando personalmente los codigos despues de comprender mejor las estructuras.
-33. **Ayuda con errores de direcciones y test:** Al momento de hacer los test tuve errores con las direcciones de los archivos y mediante esto pude aprender porque sucedia ese error y aprendi una forma nueva de hacer los test para que pueda tener contexto de todas las carpetas del proyecto
+3. **Ayuda con errores de direcciones y test:** Al momento de hacer los test tuve errores con las direcciones de los archivos y mediante esto pude aprender porque sucedia ese error y aprendi una forma nueva de hacer los test para que pueda tener contexto de todas las carpetas del proyecto
+
+## [2026-07-18] — Entrada 5:   Ejercicio integrador: “El Driver Modernizado” (4–5 h)
+
+###  Lo que aprendí / Implementaciones
+1. **Implementacion de principios SOLID:** Este ejercicio fue un ejercicio en donde se aplican los principios SOLID anteriormente vistos y se ponen a prueba en un sistema mas complejo pero que al momento de seguir estos principios se hace un poco mas sencillo de implementar.
+2. **Aprendizaje de frames:** Este ejercicio como lo dice al ser integrador no solamente va solo de programacion, tambien se pusieron a prueba otros conocimientos que actualmente no tenia y fue interesante al menos aprender un poco de esto.
+
+###  Notas de Verificación de Calidad
+El código fue verificado localmente utilizando las herramientas del entorno de QA:
+* **Pytest:** Al inicio me ayudo a detectar problemas en las direcciones con los imports y algunos errores de sintaxis pero posteriormente nos dio una validacion exitosa sin ninguna obseervacion.
+* **Mypy (`--strict`):** Las primeras validaciones reflejaron algunos errores en definiciones y tambien en algunos conflictos con algunos tipos de datos, posteriormente la validación de firmas exitosa. Nota: al realizar el test siempre dara un error que intencionalmente es asi, fue para probar la funcionalidad del codigo a testear.
+* **Ruff:** Ninguna correccion realizada por ```ruff check``` y formateo mediante ```ruff format```
+
+### Prompts utilizados
+1. **Arquitectura del ejercicio:** Al inicio del ejercicio no tenia una idea de como iniciar este ejercicio asi que solicite una explicacion y un ejemplo de como se debia realizar el ejercicio.
+2. **Asistencia en errores de test:** Al realizar los test surgieron errores los cuales solucione de forma eficiente con ayuda de la IA.
+3. **Ayuda con parseo:** La logica de parseo en los diferentes protocolos fue algo que desconocia totalmente por lo cual esta parte del codigo fue solicitada en su mayoria.

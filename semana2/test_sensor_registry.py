@@ -1,3 +1,4 @@
+import pytest
 from sensor_registry import SensorRegistry, SensorNotFoundError
 
 # 1) RED - el test primero; pytest DEBE fallar (ImportError)

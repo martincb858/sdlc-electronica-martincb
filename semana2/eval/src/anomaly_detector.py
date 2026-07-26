@@ -16,7 +16,6 @@ class AnomalyDetector:
         temp_alta = reading.temperatura > self.temp_threshold
         hum_alta = reading.humedad > self.hum_threshold
 
-        # Evaluamos la tabla de verdad (temp_alta, hum_alta)
         match (temp_alta, hum_alta):
             case (True, True):
                 return AnomalyType.TEMPERATURA_Y_HUMEDAD

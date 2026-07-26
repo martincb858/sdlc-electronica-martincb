@@ -2,9 +2,8 @@ import pytest
 from datetime import datetime
 from src.sensor_reading import SensorReading
 
-
 # US-3
-def test_creacion_lectura_valida():
+def test_creacion_lectura_valida() -> None:
     now = datetime.now()
     #Valores de temp y hum fijos pero serian variables
     reading = SensorReading(device_id="BODEGA-1", temperatura=25.0, humedad=50.0, timestamp=now) 
@@ -12,18 +11,16 @@ def test_creacion_lectura_valida():
     assert reading.temperatura == 25.0
     assert reading.humedad == 50.0
 
-def test_rechazo_temperatura_alta():
-    with pytest.raises(ValueError, match="fuera de rango físico"):
-        SensorReading("BODEGA-1", temperatura=150.0, humedad=50.0, timestamp=datetime.now())
-
-def test_rechazo_temperatura_baja():
-    with pytest.raises(ValueError, match="fuera de rango físico"):
-        SensorReading("BODEGA-1", temperatura=-15.0, humedad=50.0, timestamp=datetime.now())
-
-def test_rechazo_humedad_negativa():
-    with pytest.raises(ValueError, match="fuera de rango físico"):
-        SensorReading("BODEGA-1", temperatura=20.0, humedad=-5.0, timestamp=datetime.now())
-
-def test_rechazo_humedad_excesiva():
-    with pytest.raises(ValueError, match="fuera de rango físico"):
-        SensorReading("BODEGA-1", temperatura=20.0, humedad=105.0, timestamp=datetime.now())
+@pytest.mark.parametrize("temperatura, humedad", [
+    (25.0, 50.0),
+    (0.0, 100.0),
+    (100.0, 0.0)
+])
+def test_limites_validos(temperatura, humedad) -> None:
+    reading = SensorReading("BODEGA-1", temperatura=temperatura, humedad=humedad, timestamp=datetime.now())
+    if temperatura < -10.0 or temperatura > 100.0 or humedad < 0.0 or humedad > 100.0:
+        with pytest.raises(ValueError, match="fuera de rango físico"):
+            SensorReading("BODEGA-1", temperatura=temperatura, humedad=humedad, timestamp=datetime.now())
+    else:
+        assert reading.temperatura == temperatura
+        assert reading.humedad == humedad

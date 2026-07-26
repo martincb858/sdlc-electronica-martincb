@@ -1,7 +1,7 @@
 # Plan de Ejecución — Sprint 1
 
 ## 1. Sprint Goal
-> **"Establecer una arquitectura backend funcional y local que permita el registro y autenticación de los 10 nodos sensores, la recepción continua y validada de telemetría cada 30 segundos, y la detección y notificación automatizada de anomalías ambientales en tiempo real."**
+**"Establecer una arquitectura backend funcional y local que permita el registro y autenticación de los 10 nodos sensores, la recepción continua y validada de telemetría cada 30 segundos, y la detección y notificación automatizada de anomalías ambientales en tiempo real."**
 
 ---
 

@@ -1,7 +1,10 @@
-import pytest
 from datetime import datetime, timezone
+
+import pytest
+
 from app.db import ReadingModel
-from app.services.reading import ReadingService
+from app.services.reading_service import ReadingService
+
 
 class FakeReadingRepository:
     def __init__(self):
@@ -9,6 +12,7 @@ class FakeReadingRepository:
         self._current_id = 1
 
     def add(self, sensor_id: str, value: float, unit: str) -> ReadingModel:
+        # Simulamos lo que haría SQLAlchemy: crear el modelo y asignarle un ID
         reading = ReadingModel(
             id=self._current_id,
             sensor_id=sensor_id,
@@ -19,26 +23,33 @@ class FakeReadingRepository:
         self._readings.append(reading)
         self._current_id += 1
         return reading
-
-    def list_for_sensor(self, sensor_id: str) -> list[ReadingModel]:
+    
+    def list_for_sensor(
+        self,
+        sensor_id: str,
+        limit: int = 10,
+        offset: int = 0,
+        from_date: datetime | None = None,
+        to_date: datetime | None = None,
+    ) -> list[ReadingModel]:
         return [r for r in self._readings if r.sensor_id == sensor_id]
 
 def test_service_records_valid_reading() -> None:
+    """Prueba que un dato válido pasa por el servicio y llega al repositorio."""
     fake_repo = FakeReadingRepository()
     service = ReadingService(fake_repo)
-    
+
     result = service.record("TEMP-01", 25.5, "C")
     
     assert result.sensor_id == "TEMP-01"
     assert result.value == 25.5
-    assert len(fake_repo._readings) == 1
+    assert len(fake_repo._readings) == 1 
 
 def test_service_raises_error_below_absolute_zero() -> None:
-    """Prueba que la regla de negocio bloquea lecturas físicamente imposibles."""
+
     fake_repo = FakeReadingRepository()
     service = ReadingService(fake_repo)
-    
-    # Comprobamos que lanzar una excepción ValueError es el comportamiento esperado
+
     with pytest.raises(ValueError, match="Temperatura invalida"):
         service.record("TEMP-01", -300.0, "C")
 
@@ -47,12 +58,10 @@ def test_service_can_list_sensor_history() -> None:
     fake_repo = FakeReadingRepository()
     service = ReadingService(fake_repo)
     
-    # Agregamos ruido (datos de otro sensor) y datos del sensor objetivo
     service.record("SENSOR-A", 10.0, "C")
     service.record("SENSOR-A", 12.5, "C")
     service.record("SENSOR-B", 99.0, "C")
     
-    # Verificamos
     history = service.get_history("SENSOR-A")
     assert len(history) == 2
     assert history[0].value == 10.0

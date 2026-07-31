@@ -1,5 +1,8 @@
+from datetime import datetime
 from typing import Protocol
+
 from app.db import ReadingModel
+
 
 class ReadingRepository(Protocol):
 
@@ -17,5 +20,13 @@ class ReadingService:
         
         return self._repo.add(sensor_id, value, unit)
 
-    def get_history(self, sensor_id: str) -> list[ReadingModel]:
-        return self._repo.list_for_sensor(sensor_id)
+    def get_history(
+        self, 
+        sensor_id: str, 
+        limit: int = 10, 
+        offset: int = 0, 
+        from_date: datetime | None = None,
+        to_date: datetime | None = None
+        ) -> list[ReadingModel]:
+        
+        return self._repo.list_for_sensor(sensor_id, limit, offset, from_date, to_date)

@@ -1,4 +1,5 @@
-from typing import Optional, Dict, Any
+from typing import Any
+
 from config import UartConfig
 from parsers import MessageParser
 
@@ -26,7 +27,7 @@ class UartDevice:
         if self._is_connected:
             self._is_connected = False
 
-    def read_and_parse(self, raw_data: bytes) -> Optional[Dict[str, Any]]:
+    def read_and_parse(self, raw_data: bytes) -> dict[str, Any] | None:
         """
         Lee datos del bus y utiliza el parser inyectado para decodificarlos.
         Levanta RuntimeError si el dispositivo no está conectado.

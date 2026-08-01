@@ -1,24 +1,24 @@
-import os
 import json
-import pytest    
-from solid_srp_ocp_lsp import (
-    SensorReader_M, 
-    DataLogger, 
-    SensorReading, 
-    SensorReader_B, 
-    AnomalyDetector_M, 
-    AlertStrategy, 
-    ConsoleAlert, 
-    FileAlert, 
-    AnomalyDetector_B,
-    TemperatureSensor_M,
-    HumiditySensor_M,
-    process_sensor_M,
-    TemperatureSensor,
-    HumiditySensor,
-    process_sensor_B,
-    BaseSensor,
+import os
 
+import pytest
+from solid_srp_ocp_lsp import (
+    AlertStrategy,
+    AnomalyDetector_B,
+    AnomalyDetector_M,
+    BaseSensor,
+    ConsoleAlert,
+    DataLogger,
+    FileAlert,
+    HumiditySensor,
+    HumiditySensor_M,
+    SensorReader_B,
+    SensorReader_M,
+    SensorReading,
+    TemperatureSensor,
+    TemperatureSensor_M,
+    process_sensor_B,
+    process_sensor_M,
 )
 
 # =====================================================================
@@ -41,7 +41,7 @@ def test_SRP_M() -> None:
     reader.log(reading, "test_sensor_log.json")
     assert os.path.exists(filename)
 
-    with open(filename, "r") as f:
+    with open(filename) as f:
         saved_data = json.load(f)
         
     assert saved_data["sensor_id"] == "TEMP-01"
@@ -69,7 +69,7 @@ def test_SRP_B() -> None:
     logger.log(reading, "test_sensor_log.json")
     assert os.path.exists(filename)
 
-    with open(filename, "r") as f:
+    with open(filename) as f:
         saved_data = json.load(f)
         
     assert saved_data["sensor_id"] == "TEMP-01"
@@ -134,7 +134,7 @@ def test_OCP_B(strategy: AlertStrategy, value: float, capsys: pytest.CaptureFixt
             
         elif isinstance(strategy, FileAlert):
             assert os.path.exists(strategy.filepath) # El archivo debe existir
-            with open(strategy.filepath, "r") as f:
+            with open(strategy.filepath) as f:
                 assert expected_message in f.read()  # El archivo debe tener el texto
             
             os.remove(strategy.filepath) # Limpiamos al terminar

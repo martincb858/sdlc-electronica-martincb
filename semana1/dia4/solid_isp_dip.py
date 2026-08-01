@@ -1,6 +1,8 @@
-from typing import Protocol
-from dia3.solid_srp_ocp_lsp import SensorReading
 from abc import ABC, abstractmethod
+from typing import Protocol
+
+from dia3.solid_srp_ocp_lsp import SensorReading
+
 
 class DataRepository(Protocol):
     def save(self, reading: SensorReading) -> None: ...

@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import pytest
 from src.anomaly_detector import AnomalyDetector, AnomalyType
 from src.sensor_reading import SensorReading

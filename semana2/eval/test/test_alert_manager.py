@@ -1,8 +1,9 @@
-import pytest
 from datetime import datetime, timedelta
+
+import pytest
+from src.alert_manager import AlertManager
 from src.anomaly_detector import AnomalyDetector
 from src.sensor_reading import SensorReading
-from src.alert_manager import AlertManager
 
 
 @pytest.mark.parametrize("temperatura, humedad", [

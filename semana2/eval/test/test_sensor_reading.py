@@ -1,6 +1,8 @@
-import pytest
 from datetime import datetime
+
+import pytest
 from src.sensor_reading import SensorReading
+
 
 # US-3
 def test_creacion_lectura_valida() -> None:

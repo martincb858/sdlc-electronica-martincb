@@ -1,16 +1,15 @@
 import pytest
 from solid_isp_dip import (
-    SimpleThermometer_M,
-    SimpleThermometer_B,
     AdvancedSmartSensor_B,
-    Readable,
-    Calibratable,   
-    DataProcessor_M,
+    Calibratable,
     DataProcessor_B,
+    DataProcessor_M,
     InMemoryRepository,
+    Readable,
     SensorReading,
+    SimpleThermometer_B,
+    SimpleThermometer_M,
 )
-
 
 # =====================================================================
 # TESTS ISP

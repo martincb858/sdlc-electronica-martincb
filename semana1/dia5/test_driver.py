@@ -1,8 +1,8 @@
+import json
+from dataclasses import FrozenInstanceError
 from pathlib import Path
 
 import pytest
-import json
-from dataclasses import FrozenInstanceError
 from config import UartConfig
 from device import UartDevice
 from parsers import ModbusParser, NMEAParser
@@ -86,7 +86,7 @@ def test_data_recorder_writes_json_lines(tmp_path: Path) -> None:
     recorder.record(data2)
 
     # Leemos el archivo real para comprobar qué se guardó
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         lines = f.readlines()
 
     assert len(lines) == 2

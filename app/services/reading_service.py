@@ -1,38 +1,24 @@
 from datetime import datetime
-from typing import Protocol
 
 from app.db import ReadingModel
-
-
-class ReadingRepository(Protocol):
-    def add(self, sensor_id: str, value: float, unit: str) -> ReadingModel: ...
-    def list_for_sensor(
-        self, 
-        sensor_id: str, 
-        limit: int, 
-        offset: int, 
-        from_date: datetime | None, 
-        to_date: datetime | None
-    ) -> list[ReadingModel]: ...
-    
-    # Nuevos "pines" en nuestro contrato para soportar REST completo
-    def get_by_id(self, reading_id: int) -> ReadingModel | None: ...
-    def update(
-        self, 
-        reading_id: int, 
-        value: float | None, 
-        unit: str | None
-        ) -> ReadingModel | None: ...
-    def delete(self, reading_id: int) -> bool: ...
+from app.repositories.reading_repositorie import SqlAlchemyReadingRepository
+from app.validator import ValidatorRegistry, operational_registry
 
 
 class ReadingService:
-    def __init__(self, repo: ReadingRepository) -> None:
+    def __init__(
+        self,
+        repo: SqlAlchemyReadingRepository,
+        operational_registry: ValidatorRegistry = operational_registry,
+    ) -> None:
         self._repo = repo
+        self._operational_registry = operational_registry
 
     def record(self, sensor_id: str, value: float, unit: str) -> ReadingModel:
-        if unit.upper() == "C" and value < -25.0:
-            raise ValueError("Temperatura invalida")
+        unit = unit.upper()
+        validator = self._operational_registry.get_optional(unit)
+        if validator is not None:
+            validator.validate(value)
 
         return self._repo.add(sensor_id, value, unit)
 
@@ -47,23 +33,17 @@ class ReadingService:
 
         return self._repo.list_for_sensor(sensor_id, limit, offset, from_date, to_date)
 
-    def get_reading(
-        self, 
-        reading_id: int
-        ) -> ReadingModel | None:
-
+    def get_reading(self, reading_id: int) -> ReadingModel | None:
         return self._repo.get_by_id(reading_id)
-        
-    def update_reading(
-        self, 
-        reading_id: int, 
-        value: float | None, 
-        unit: str | None
-        ) -> ReadingModel | None:
 
-        if unit and unit.upper() == "C" and value is not None and value < -25:
-            raise ValueError("Temperatura por debajo del cero absoluto")
+    def update_reading(
+        self,
+        reading_id: int,
+        value: float | None,
+        unit: str | None,
+    ) -> ReadingModel | None:
+
         return self._repo.update(reading_id, value, unit)
-        
+
     def delete_reading(self, reading_id: int) -> bool:
         return self._repo.delete(reading_id)

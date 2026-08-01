@@ -1,50 +1,115 @@
-from app.repositories.reading import SqlAlchemyReadingRepository
+from datetime import datetime
+
+from fastapi import Depends, FastAPI, HTTPException, Query, status
+from sqlalchemy.orm import Session
 
 from app.db import Base, SessionLocal, engine
+from app.repositories.reading_repositorie import SqlAlchemyReadingRepository
+from app.schemas.reading_schema import ReadingCreate, ReadingOut, ReadingUpdate
 from app.services.reading_service import ReadingService
 
-# Esto crea el archivo sensorhub.db y las tablas si no existen
 Base.metadata.create_all(bind=engine)
 
+app = FastAPI(title="SensorHub API", version="0.2.0")
 
-def run_local_test():
-
-    db_session = SessionLocal()
-
+def get_db():
+    db = SessionLocal()
     try:
-        repo = SqlAlchemyReadingRepository(db_session)
-        service = ReadingService(repo)
+        yield db
+    finally:
+        db.close()
 
-        print("PRUEBA INICIADA")
+def get_reading_service(db: Session = Depends(get_db)) -> ReadingService:
+    repo = SqlAlchemyReadingRepository(db)
+    return ReadingService(repo)
 
-        print("\n1. Registrando datos de temperatura normales...")
-        r1 = service.record("TEMP-01", 24.5, "C")
-        print(f"Guardado con ID de Base de Datos: {r1.id}")
+@app.get(
+    "/sensors/{sensor_id}/readings", 
+    response_model=list[ReadingOut], 
+    status_code=status.HTTP_200_OK
+)
+def list_readings(
+    sensor_id: str,
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    from_date: datetime | None = None,
+    to_date: datetime | None = None,
+    service: ReadingService = Depends(get_reading_service)
+):
+    return service.get_history(sensor_id, limit, offset, from_date, to_date)
 
-        r2 = service.record("TEMP-01", 25.1, "C")
-        print(f"Guardado con ID de Base de Datos: {r2.id}")
+@app.post(
+    "/sensors/{sensor_id}/readings", 
+    response_model=ReadingOut, 
+    status_code=status.HTTP_201_CREATED
+)
+def create_reading(
+    sensor_id: str, 
+    reading: ReadingCreate, 
+    service: ReadingService = Depends(get_reading_service)
+):
+    try:
+        return service.record(sensor_id, reading.value, reading.unit)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-        print("\n2. Recuperando el historial del sensor TEMP-01...")
-        history = service.get_history(
-            "TEMP-01", limit=10, offset=0, from_date=None, to_date=None
+@app.get(
+    "/readings/{reading_id}", 
+    response_model=ReadingOut, 
+    status_code=status.HTTP_200_OK
+)
+def get_reading(
+    reading_id: int, 
+    service: ReadingService = Depends(get_reading_service)
+    ):
+
+    reading = service.get_reading(reading_id)
+    if not reading:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Lectura no encontrada"
+        )
+    return reading
+
+@app.patch(
+    "/readings/{reading_id}", 
+    response_model=ReadingOut, 
+    status_code=status.HTTP_200_OK
+)
+def update_reading(
+    reading_id: int, 
+    reading_update: ReadingUpdate, 
+    service: ReadingService = Depends(get_reading_service)
+):
+    try:
+        updated = service.update_reading(
+            reading_id, 
+            reading_update.value, 
+            reading_update.unit
+        )
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail="Lectura no encontrada"
+            )
+        return updated
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=str(e)
         )
 
-        for reading in history:
-            print(
-                f"ID={reading.id}: {reading.value} °{reading.unit}"
-                f" (Fecha: {reading.created_at})"
-            )
-
-        print("\n3. Intentando registrar una temperatura imposible (-300 °C)...")
-        try:
-            service.record("TEMP-01", -300.0, "C")
-        except ValueError as error_msg:
-            print(f"Bloqueo: '{error_msg}'")
-
-    finally:
-        db_session.close()
-        print("\nFIN DE PRUEBA")
-
-
-if __name__ == "__main__":
-    run_local_test()
+@app.delete(
+    "/readings/{reading_id}", 
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_reading(
+    reading_id: int, 
+    service: ReadingService = Depends(get_reading_service)
+    ):
+    success = service.delete_reading(reading_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Lectura no encontrada"
+        )

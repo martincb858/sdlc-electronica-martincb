@@ -21,7 +21,6 @@ class ReadingService:
     ) -> None:
         self._repo = repo
         self._sensor_repo = sensor_repo
-
         self._operational_registry = operational_registry
         self._sensor_type_registry = sensor_type_registry
 

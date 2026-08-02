@@ -15,10 +15,7 @@ from app.services.sensor_service import SensorService
 
 @pytest.fixture
 def db_session():
-    """Crea una base de datos SQLite en memoria para tests, con un único
-    connection persistente (StaticPool) para que sobreviva a través de
-    múltiples requests del TestClient.
-    """
+    
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},

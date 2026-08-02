@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Any
+
 
 class MessageParser(ABC):
     """
@@ -12,7 +13,7 @@ class MessageParser(ABC):
         pass
 
     @abstractmethod
-    def parse(self, data: bytes) -> Dict[str, Any]:
+    def parse(self, data: bytes) -> dict[str, Any]:
         """Extrae la información de la trama y la retorna como un diccionario."""
         pass
 
@@ -45,7 +46,7 @@ class ModbusParser(MessageParser):
         
         return expected_crc == received_crc
 
-    def parse(self, data: bytes) -> Dict[str, Any]:
+    def parse(self, data: bytes) -> dict[str, Any]:
         """Extrae la dirección, función y payload de la trama Modbus."""
         if not self.can_parse(data):
             raise ValueError("Trama Modbus RTU inválida o corrupta")
@@ -85,7 +86,7 @@ class NMEAParser(MessageParser):
         except (UnicodeDecodeError, ValueError):
             return False
 
-    def parse(self, data: bytes) -> Dict[str, Any]:
+    def parse(self, data: bytes) -> dict[str, Any]:
         """Extrae latitud, longitud y calidad de la señal de la sentencia $GPGGA."""
         if not self.can_parse(data):
             raise ValueError("Sentencia NMEA inválida o corrupta")
@@ -94,7 +95,7 @@ class NMEAParser(MessageParser):
         parts = text.split(',')
         
         # Estructura base. Si no es GPGGA, devolvemos un diccionario genérico.
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "protocol": "NMEA",
             "type": parts[0].replace('$', '')
         }
@@ -126,7 +127,7 @@ class CanParser(MessageParser):
         # La trama total debe ser exactamente 3 bytes de cabecera + los bytes del payload
         return len(data) == (3 + dlc)
 
-    def parse(self, data: bytes) -> Dict[str, Any]:
+    def parse(self, data: bytes) -> dict[str, Any]:
         """Extrae el ID del nodo, el tamaño y los datos del payload."""
         if not self.can_parse(data):
             raise ValueError("Trama CAN inválida o longitud incorrecta")

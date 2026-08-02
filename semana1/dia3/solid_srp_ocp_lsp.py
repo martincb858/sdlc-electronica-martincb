@@ -4,10 +4,11 @@
 # L - TemperatureSensor y HumiditySensor son intercambiables donde se espera
 #     BaseSensor: process_sensor(sensor: BaseSensor) funciona con cualquiera.
  
-from abc import ABC, abstractmethod
 import json
 import os
+from abc import ABC, abstractmethod
 from dataclasses import dataclass  # <--- IMPORTANTE: Agrega esto
+
 
 @dataclass
 class SensorReading:

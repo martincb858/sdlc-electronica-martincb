@@ -1,5 +1,6 @@
 import threading
-from typing import Any, Optional
+from typing import Any
+
 
 class ThreadSafeCircularBuffer:
     """
@@ -27,7 +28,7 @@ class ThreadSafeCircularBuffer:
                 # Si está lleno, al empujar la cabeza empujamos también la cola
                 self.tail = (self.tail + 1) % self.size
 
-    def pop(self) -> Optional[Any]:
+    def pop(self) -> Any | None:
         """Extrae el elemento más antiguo. Retorna None si está vacío."""
         with self.lock:
             if self.count == 0:

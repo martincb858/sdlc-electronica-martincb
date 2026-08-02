@@ -1,6 +1,7 @@
 # semana1/test_fsm.py
 from fsm_demo import TrafficLightFSM, TrafficLightState
 
+
 def test_initial_state():
     """1. Test de estado inicial: la FSM debe arrancar en RED."""
     fsm = TrafficLightFSM()

@@ -110,6 +110,6 @@ def test_openapi_schema_includes_sensor_and_reading_paths(client: TestClient) ->
     assert response.status_code == 200
     paths = response.json()["paths"]
     assert "/sensors" in paths
-    assert "/sensors/{sensor_id}" in paths
-    assert "/sensors/{sensor_id}/readings" in paths
+    assert "/sensors/{sensor_code}" in paths
+    assert "/sensors/{sensor_code}/readings" in paths
     assert "/readings/{reading_id}" in paths

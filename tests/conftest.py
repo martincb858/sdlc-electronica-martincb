@@ -15,7 +15,7 @@ from app.services.sensor_service import SensorService
 
 @pytest.fixture
 def db_session():
-    
+
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},

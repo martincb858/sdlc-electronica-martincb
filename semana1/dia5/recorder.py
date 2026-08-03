@@ -1,6 +1,6 @@
 import json
-from typing import Dict, Any
 from pathlib import Path
+from typing import Any
 
 
 class DataRecorder:
@@ -13,7 +13,7 @@ class DataRecorder:
         self.filepath = Path(filepath)
         self.filepath.parent.mkdir(parents=True, exist_ok=True)
 
-    def record(self, data: Dict[str, Any]) -> None :
+    def record(self, data: dict[str, Any]) -> None :
         """
         Agrega un diccionario como una nueva línea JSON en el archivo.
         Debe abrir el archivo en modo 'append' (a).

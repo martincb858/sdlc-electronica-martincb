@@ -1,5 +1,7 @@
-from src.sensor_reading import SensorReading
 from enum import Enum
+
+from src.sensor_reading import SensorReading
+
 
 class AnomalyType(str, Enum):
     NORMAL = "OPERACION_NORMAL"

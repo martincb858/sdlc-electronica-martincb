@@ -1,20 +1,18 @@
 from fastapi import FastAPI
-from pydantic import BaseModel, Field
- 
-app = FastAPI(title="SensorHub API", version="0.1.0")
- 
-class SensorReadingIn(BaseModel):
-    sensor_id: str = Field(..., examples=["TEMP-01"])
-    value: float
-    unit: str = "C"
- 
-class SensorReadingOut(SensorReadingIn):
-    id: int
- 
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
- 
-@app.post("/readings", response_model=SensorReadingOut, status_code=201)
-def create_reading(reading: SensorReadingIn) -> SensorReadingOut:
-    return SensorReadingOut(id=1, **reading.model_dump())  # manana lo persistimos
+
+from app.db import Base, engine
+from app.routers import reading_router, sensor_router
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="SensorHub API",
+    version="0.3.0",
+    description=(
+        "API para gestionar sensores IoT y sus lecturas, con validacion "
+        "fisica real por tipo de sensor."
+    ),
+)
+
+app.include_router(sensor_router.router)
+app.include_router(reading_router.router)

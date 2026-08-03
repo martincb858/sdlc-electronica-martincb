@@ -1,89 +1,80 @@
-# Bitácora de IA
+# Bitácora de Inteligencia Artificial - Semana 3
 ---
 
-## [2026-07-16] — Entrada 1: Python idiomático para ingenieros de C
+Esta bitácora documenta el proceso de aprendizaje, los desafíos técnicos y la integración de herramientas de Inteligencia Artificial durante la tercera semana de desarrollo, enfocada en la persistencia de datos, arquitectura de software y desarrollo de APIs.
 
+---
 
-###  Lo que aprendí / Implementaciones
-1. **Inmutabilidad con Dataclasses:** Reemplazar los structs mutables tradicionales por instancias `frozen=True`. Si un dato cambia (ej. conversión a Fahrenheit o Kelvin), se genera un nuevo objeto en lugar de sobreescribir el registro en memoria, evitando efectos secundarios.
-2. **Protocolos (`typing.Protocol`):** Definición de interfaces estructurales sin herencia forzada (Duck Typing estático), ideal para desacoplar drivers de hardware de la lógica de procesamiento.
-3. **Serialización Cruda:** Uso de `struct.pack('!d', ...)` para empaquetar flotantes de 64 bits en Big-Endian, permitiendo una comunicación directa con microcontroladores receptores.
+##  [2026-07-28] — Entrada 1: Persistencia con SQLAlchemy 2.x
 
-###  Notas de Verificación de Calidad
-El código fue verificado localmente utilizando las herramientas del entorno de QA:
-* **Mypy (`--strict`):** Validación de firmas exitosa. Cero tipos dinámicos implícitos (`Any`).
-* **Ruff:** Ninguna correccion realizada por ```ruff check ejercicios.py``` y formateo mediante ```ruff format ejercicios.py```
+###  Lo que aprendí e Implementaciones
+Durante esta jornada me adentré en el uso de **SQLAlchemy 2.x**. Aunque previamente había tenido interacciones básicas con bases de datos como SQLite, esta sesión funcionó como mucho más que un simple repaso, ya que me permitió comprender conceptos profundos del ORM que antes pasaba por alto. 
 
-### Prompts utilizados
-Para el desarrollo de esta actividad se utilizo un LLM para profundizar en algunos aspectos del codigo:
-1. **Ejemplos de codigo:** Se solicitaron ejemplos de codigo en el cual se utilizan las funciones especificadas en el codigo de ejemplo, posteriormente se analiza cada ejemplo linea por linea para una mayor comprension.
-2. **Ejemplificacion de uso de mypy y ruff:** Se solicita un ejemplo practico del uso de mypy y ruff para hacer test y aprender el uso practico de estas dos herramientas.
-3. **Formato de archivos .md:** Por ultimo se solicita ayuda para formatear la bitacora y aprender a darle formatos en archivos del tipo `bitacoras.md`
+Aprendí sobre la nueva sintaxis y el paradigma de la versión 2.0, enfocándome en la declaración de modelos. Realicé varias implementaciones de prueba prácticas, ya que personalmente encuentro mucho más efectivo el aprendizaje empírico ("aprender haciendo") que la simple lectura de documentación. Esto me permitió asimilar cómo el código en Python se traduce en transacciones SQL reales.
 
-## [2026-07-16] — Entrada 2:  La FSM que ya conoces, ahora orientada a objetos (3–4 h)
+###  Prompts y Uso de IA
+Utilicé la IA como un tutor personalizado para desglosar conceptos complejos. Mis interacciones se centraron en:
+1. **Funcionamiento de Core vs ORM:** Pedí explicaciones claras sobre la diferencia entre la capa de abstracción de base de datos (Core) y el mapeo objeto-relacional (ORM).
+2. **Clases Base:** Solicité ejemplos sobre cómo estructurar y heredar de la clase `Base` declarativa.
+3. **Mapeo de datos (`Mapped`):** Indagué sobre el uso de tipado estricto con `Mapped` y `mapped_column` introducidos en las versiones recientes.
+4. **Operaciones CRUD:** Pedí ejemplos específicos de funciones de edición en la base de datos (operaciones `SELECT`, `JOIN`, `DELETE`, y actualizaciones de estado).
 
+###  Reflexión
+> El uso de SQLAlchemy facilita enormemente la interacción con la base de datos, pero tiene una curva de aprendizaje inicial pronunciada. Utilizar la IA para generar fragmentos de código de prueba fue clave para desbloquear mi comprensión. Me di cuenta de que tener una base teórica es importante, pero ver los datos persistir en tiempo real gracias a los scripts de prueba es lo que realmente consolida el conocimiento.
 
-###  Lo que aprendí / Implementaciones
-1. **Test con pytest:** Realizar test con `pytest` es algo muy interesante ya que ejecuta las funciones que tengan la forma `def test_function():` lo que hace muy facil generar un codigo el cual pueda poner a prueba la funcionalidad de nuestro codigo en casos que nosotros esperamos.
-2. **Assert en test:** La funcion `assert` es una funcion que es nueva para mi pero muy interesante ya que es muy util para testear el codigo, esta funcion nos ayuda a saber si algo es `True` o `False` como un `if` pero mucho mas sencillo y mas util para los test.
+---
 
-###  Notas de Verificación de Calidad
-El código fue verificado localmente utilizando una de las herramientas del entorno:
-* **Pytest:** Dandonos una validacion exitosa sin ninguna obseervacion
+##  [2026-07-30] — Entrada 2: Patrón Repositorio y Capa de Servicio
 
-### Prompts utilizados
-1. **Ejemplos de codigo:** Gracias a solicitar ejemplos de codigo reales pude observar funciones nuevas como lo fueron los assert que posteriormente implemente.
-2. **Explicacion de codigos:** Al momento de observar nuevas funciones solicite una explicacion mas extensa sobre estos metodos y sobre su funcion real.
+###  Lo que aprendí e Implementaciones
+Este fue un día de gran crecimiento técnico. Al iniciar la jornada, me sentía desorientado sobre cómo estructurar el proyecto, ya que el concepto de "Capa de Servicio" y "Patrón Repositorio" era completamente nuevo para mí. 
 
+Aprendí que el **Patrón Repositorio** se encarga exclusivamente de la comunicación con la base de datos (abstraer las consultas), mientras que la **Capa de Servicio** encapsula toda la lógica de negocio (las reglas de la aplicación). Empecé a visualizar cómo esta separación de responsabilidades hace que el código sea más limpio, escalable y, sobre todo, testeable.
 
-## [2026-07-18] — Entrada 3:  SOLID en la práctica: S, O y L (3–4 h)
+###  Prompts y Uso de IA
+Mi flujo de trabajo con la IA cambió hacia un enfoque más arquitectónico y orientado a pruebas (TDD):
+*   **Exploración conceptual:** Comencé pidiendo definiciones sencillas, casos de uso y ejemplos de código aplicados a Python sobre las capas de servicio y repositorios.
+*   **Pseudocódigo para Tests:** En lugar de pedir código funcional de inmediato, escribí textualmente (en lenguaje natural y pseudocódigo) qué debían hacer mis pruebas. Envié este borrador a la IA para que me ayudara a estructurar los tests reales.
+*   **Contraste de modelos:** Tomé la respuesta generada y la comparé utilizando otra IA para obtener una segunda opinión. A partir de las observaciones cruzadas, procedí a escribir el código de los repositorios y servicios de manera abstracta, apoyándome iterativamente en las sugerencias generadas.
 
+###  Reflexión
+> Delegar la fase de investigación a una IA ahorra incontables horas de lectura en foros y documentación fragmentada. Aunque eran temas de arquitectura de software que desconocía por completo, la IA me proporcionó el contexto mínimo viable para empezar a codificar. Sin embargo, aprendí una lección valiosa: los LLMs pueden desviarse del tema o proponer arquitecturas sobredimensionadas, por lo que es crucial mantener el pensamiento crítico y revisar línea por línea cada sugerencia antes de integrarla.
 
-###  Lo que aprendí / Implementaciones
-1. **Aprendizaje de SRP:** Comprendi un poco el enfoque que tiene este principio, el cual es separar las tareas para que cada clase se encargue de una sola tarea.
-2. **Aprendizaje de OCP:** El principio de Abierto/Cerrado fue algo que fue muy familiar para mi personalmente, ya que muchas veces me gusta hacer codigos que puedan tener esa compatibiidad de solo modificar una variable y hacer el codigo capaz de adfaptarse a ello sin problema, ademas de que fue algo muy divertido de aprender y refrescante.
-3. **Profundizacion en pytest:** Algo relacionado a OCP fue el uso de parametros especificos para `pytest` esto me ayudo a aprender algo muy interesante yy nuevo que me ayudo a hacer mas faciles las tareas de test.
-4. **Aprendizaje de LSP:** Por ultimo este ultimo principio me dejo en claro que se debe tener en cuenta las clases padres e hijas, esto para hacer que nuestros codigos funcionen ya sea mandando una clase hija o alguna clase padre.
+---
 
-###  Notas de Verificación de Calidad
-El código fue verificado localmente utilizando las herramientas del entorno de QA:
-* **Mypy (`--strict`):** Validación de firmas exitosa. Cero tipos dinámicos implícitos (`Any`).
-* **Ruff:** Ninguna correccion realizada por ```ruff check``` .
-* **Pytest:** Dandonos una validacion exitosa sin ninguna obseervacion.
+##  [2026-07-30] — Entrada 3: Inyección de Dependencias y Convenciones REST
 
-### Prompts utilizados
-1. **Aprendizaje de cada principio:** Se solicitaron explicaciones de cada principio para poder comprenderlos de mejor forma, con ejemplos practicos ya en codigo.
-2. **Solicitud de codigos de ejemplo:** Al ser temas desconocidos empece por ejemplos que fui desglozando con ayuida de la IA y posteriormente fui trabajando personalmente los codigos despues de comprender mejor las estructuras.
+###  Lo que aprendí e Implementaciones
+Teniendo como base mis experimentos previos con el Swagger de FastAPI, el objetivo de hoy era conectar las piezas del rompecabezas. Sabía que debía unir mi `main.py` con los repositorios y servicios creados el día anterior, pero el mecanismo de "cómo" hacerlo era confuso. 
 
+Aprendí sobre la **Inyección de Dependencias** (usando `Depends` en FastAPI) para proveer instancias de la base de datos y servicios a las rutas. Además, reforcé mi comprensión sobre las convenciones REST y el uso correcto de los verbos HTTP (`GET`, `POST`, `PUT`, `DELETE`) para estructurar los endpoints de la API. Realicé la implementación base conectando la DB, los repositorios, los servicios y los controladores en el `main.py`.
 
-## [2026-07-18] — Entrada 5:  SOLID completo: I y D (3 h)
+###  Prompts y Uso de IA
+*   **Integración de Componentes:** Solicité un ejemplo concreto de cómo inyectar la sesión de la base de datos hacia el repositorio, y a su vez, cómo inyectar el repositorio en el servicio, para finalmente usar el servicio en el endpoint.
+*   **Verbos HTTP:** Pedí a la IA que me generara la estructura de los verbos en FastAPI. 
 
-###  Lo que aprendí / Implementaciones
-1. **Aprendizaje de ISP:** El principio ISP fue algo interesante porque es algo que siento que puede suceder mucho, a veces declaramos cosas o definimos acciones que haran algunas clases sin necesidad y hacer un codigo que no tengas que hacer esto necesariamente es muy conveniente.
-2. **Aprendizaje de DIP:** El principio DIP al igual que el ISP fue algo muy interesante de aplicar porque hacer que estas partes importantes de nuestro sistema sean por asi decirlo "independientes" en lo personal creo que es algo muy conveniente porque en el caso de que algo suceda en alguno de los dos deje de funcionar no afectaria directamente al otro y ademas de que tambien aplica un poco de otros pincipios como el OCP.
+Reconozco que en este punto no cuestioné demasiado la lógica generada; tomé el código, lo revisé superficialmente asegurándome de que no hubiera errores evidentes, y lo adapté a mi proyecto para hacerlo funcionar.
 
-###  Notas de Verificación de Calidad
-El código fue verificado localmente utilizando las herramientas del entorno de QA:
-* **Pytest:** Al inicio me ayudo a detectar problemas en las direcciones con los imports y algunos errores de sintaxis pero posteriormente nos dio una validacion exitosa sin ninguna obseervacion.
+###  Reflexión
+> Hoy fue un día donde dependí fuertemente de la IA para avanzar, ya que la teoría detrás de la Inyección de Dependencias y REST se me hizo algo abstracta inicialmente. Aunque logré que la aplicación corriera y los endpoints aparecieran en Swagger, me quedó una sensación de no haber comprendido el mecanismo subyacente al 100%. Esto me deja como tarea pendiente revisar este código con más detenimiento para no ser solo un "copiador de código", sino entender el porqué de cada inyección.
 
-### Prompts utilizados
-1. **Aprendizaje de cada principio:** Se solicitaron explicaciones de cada principio para poder comprenderlos de mejor forma, con ejemplos practicos ya en codigo.
-2. **Solicitud de codigos de ejemplo:** Al ser temas desconocidos empece por ejemplos que fui desglozando con ayuida de la IA y posteriormente fui trabajando personalmente los codigos despues de comprender mejor las estructuras.
-3. **Ayuda con errores de direcciones y test:** Al momento de hacer los test tuve errores con las direcciones de los archivos y mediante esto pude aprender porque sucedia ese error y aprendi una forma nueva de hacer los test para que pueda tener contexto de todas las carpetas del proyecto
+---
 
-## [2026-07-18] — Entrada 5:   Ejercicio integrador: “El Driver Modernizado” (4–5 h)
+##  [2026-08-03] — Entrada 4: Ejercicio Integrador - API completa de SensorHub
 
-###  Lo que aprendí / Implementaciones
-1. **Implementacion de principios SOLID:** Este ejercicio fue un ejercicio en donde se aplican los principios SOLID anteriormente vistos y se ponen a prueba en un sistema mas complejo pero que al momento de seguir estos principios se hace un poco mas sencillo de implementar.
-2. **Aprendizaje de frames:** Este ejercicio como lo dice al ser integrador no solamente va solo de programacion, tambien se pusieron a prueba otros conocimientos que actualmente no tenia y fue interesante al menos aprender un poco de esto.
+###  Lo que aprendí e Implementaciones
+Este día representó el cierre y la consolidación de todos los conceptos de la semana. Finalmente tuve el momento "¡Ajá!" respecto a la arquitectura en capas. Al intentar integrar todo en la API de **SensorHub**, me topé con varios errores de ejecución que me obligaron a revisar a fondo cómo interactuaban las diferentes partes.
 
-###  Notas de Verificación de Calidad
-El código fue verificado localmente utilizando las herramientas del entorno de QA:
-* **Pytest:** Al inicio me ayudo a detectar problemas en las direcciones con los imports y algunos errores de sintaxis pero posteriormente nos dio una validacion exitosa sin ninguna obseervacion.
-* **Mypy (`--strict`):** Las primeras validaciones reflejaron algunos errores en definiciones y tambien en algunos conflictos con algunos tipos de datos, posteriormente la validación de firmas exitosa. Nota: al realizar el test siempre dara un error que intencionalmente es asi, fue para probar la funcionalidad del codigo a testear.
-* **Ruff:** Ninguna correccion realizada por ```ruff check``` y formateo mediante ```ruff format```
+Comprendí de manera mucho más clara el rol de **Pydantic** (validación de datos de entrada/salida y serialización) frente a los modelos de SQLAlchemy (interacción con la base de datos). También aprendí a modularizar la aplicación utilizando **Routers** (`APIRouter` de FastAPI) para no saturar el `main.py`, y apliqué pruebas de integración reales a la API utilizando `TestClient`.
 
-### Prompts utilizados
-1. **Arquitectura del ejercicio:** Al inicio del ejercicio no tenia una idea de como iniciar este ejercicio asi que solicite una explicacion y un ejemplo de como se debia realizar el ejercicio.
-2. **Asistencia en errores de test:** Al realizar los test surgieron errores los cuales solucione de forma eficiente con ayuda de la IA.
-3. **Ayuda con parseo:** La logica de parseo en los diferentes protocolos fue algo que desconocia totalmente por lo cual esta parte del codigo fue solicitada en su mayoria.
+###  Prompts y Uso de IA
+Mi uso de la IA fue exhaustivo, actuando como compañero de depuración (pair-programming):
+*   **Debugging:** Pegué trazas de errores (tracebacks) que no lograba comprender, pidiendo a la IA que me explicara la causa raíz en lugar de solo darme la solución.
+*   **Reestructuración (Refactoring):** Le pedí que me explicara con mayor detalle la justificación de separar los esquemas (Schemas/Pydantic) de los modelos (Models/SQLAlchemy).
+*   **Modularidad:** Solicité ejemplos de cómo implementar `APIRouter` para separar los endpoints de SensorHub y cómo registrar esos routers en el `main`.
+*   **Testing:** Generamos en conjunto pruebas con `TestClient` para validar la API, lo que me ayudó a entender si mi división de capas realmente estaba funcionando.
+
+###  Reflexión
+> Este ha sido el día de mayor uso de IA, pero también el día de mayor asimilación técnica. Los errores que experimenté al inicio me forzaron a deconstruir lo que había hecho en los días previos. Por fin logré interiorizar *por qué* separamos el código: mantener los routers limpios, delegar la lógica a los servicios y el manejo de datos a los repositorios. 
+> 
+> La IA fue instrumental no solo para proveer ejemplos, sino para explicarme la filosofía detrás del diseño de software. Superar este desafío con SensorHub me ayudó a corregir la integración "sencilla pero frágil" que tenía antes, dejándome con conocimientos mucho más sólidos, estructurados y listos para ser aplicados en proyectos futuros.

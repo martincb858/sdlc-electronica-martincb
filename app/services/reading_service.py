@@ -2,13 +2,18 @@ from datetime import datetime
 
 from app.db import ReadingModel
 from app.domain.sensor_types import SensorTypeRegistry, sensor_type_registry
-from app.domain.validators import ValidatorRegistry, operational_registry
+from app.domain.validators import (
+    ValidatorRegistry,
+    operational_registry,
+    physics_registry,
+)
 from app.repositories.reading_repositorie import SqlAlchemyReadingRepository
 from app.repositories.sensor_repository import SqlAlchemySensorRepository
 
 
 class SensorNotFoundError(Exception):
-    """Se lanza al intentar registrar una lectura para un sensor inexistente."""
+    """Se lanza al referenciar un sensor que no existe (al crear o actualizar
+    una lectura)."""
 
 
 class ReadingService:
@@ -16,16 +21,17 @@ class ReadingService:
         self,
         repo: SqlAlchemyReadingRepository,
         sensor_repo: SqlAlchemySensorRepository,
+        physics_registry: ValidatorRegistry = physics_registry,
         operational_registry: ValidatorRegistry = operational_registry,
         sensor_type_registry: SensorTypeRegistry = sensor_type_registry,
     ) -> None:
         self._repo = repo
         self._sensor_repo = sensor_repo
+        self._physics_registry = physics_registry
         self._operational_registry = operational_registry
         self._sensor_type_registry = sensor_type_registry
 
-    def record(self, sensor_id: str, value: float, unit: str) -> ReadingModel:
-        unit = unit.upper()
+    def _validate_reading(self, sensor_id: str, value: float, unit: str) -> None:
 
         sensor = self._sensor_repo.get_by_code(sensor_id)
         if sensor is None:
@@ -39,10 +45,17 @@ class ReadingService:
                 f"{sensor.sensor_type} (use: {accepted})."
             )
 
-        validator = self._operational_registry.get_optional(unit)
-        if validator is not None:
-            validator.validate(value)
+        operational_validator = self._operational_registry.get_optional(unit)
+        if operational_validator is not None:
+            operational_validator.validate(value)
 
+        physics_validator = self._physics_registry.get_optional(unit)
+        if physics_validator is not None:
+            physics_validator.validate(value)
+
+    def record(self, sensor_id: str, value: float, unit: str) -> ReadingModel:
+        unit = unit.upper()
+        self._validate_reading(sensor_id, value, unit)
         return self._repo.add(sensor_id, value, unit)
 
     def get_history(
@@ -66,7 +79,17 @@ class ReadingService:
         unit: str | None,
     ) -> ReadingModel | None:
 
-        return self._repo.update(reading_id, value, unit)
+        existing = self._repo.get_by_id(reading_id)
+        if existing is None:
+            return None
+
+        final_value = value if value is not None else existing.value
+        final_unit = unit.upper() if unit is not None else existing.unit
+
+        self._validate_reading(existing.sensor_id, final_value, final_unit)
+
+        normalized_unit = unit.upper() if unit is not None else None
+        return self._repo.update(reading_id, value, normalized_unit)
 
     def delete_reading(self, reading_id: int) -> bool:
         return self._repo.delete(reading_id)

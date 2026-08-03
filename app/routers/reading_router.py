@@ -11,33 +11,34 @@ router = APIRouter(tags=["readings"])
 
 
 @router.get(
-    "/sensors/{sensor_id}/readings",
+    "/sensors/{sensor_code}/readings",
     response_model=list[ReadingOut],
     status_code=status.HTTP_200_OK,
 )
 def list_readings(
-    sensor_id: str,
+    sensor_code: str,
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     from_date: datetime | None = None,
     to_date: datetime | None = None,
     service: ReadingService = Depends(get_reading_service),
 ) -> list[ReadingModel]:
-    return service.get_history(sensor_id, limit, offset, from_date, to_date)
+
+    return service.get_history(sensor_code, limit, offset, from_date, to_date)
 
 
 @router.post(
-    "/sensors/{sensor_id}/readings",
+    "/sensors/{sensor_code}/readings",
     response_model=ReadingOut,
     status_code=status.HTTP_201_CREATED,
 )
 def create_reading(
-    sensor_id: str,
+    sensor_code: str,
     reading: ReadingCreate,
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingModel:
     try:
-        return service.record(sensor_id, reading.value, reading.unit)
+        return service.record(sensor_code, reading.value, reading.unit)
     except SensorNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except ValueError as e:
@@ -77,6 +78,8 @@ def update_reading(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Lectura no encontrada"
             )
         return updated
+    except SensorNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)

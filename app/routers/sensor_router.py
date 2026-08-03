@@ -30,11 +30,13 @@ def create_sensor(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
 
 
-@router.get("/{sensor_id}", response_model=SensorOut, status_code=status.HTTP_200_OK)
+@router.get("/{sensor_code}", response_model=SensorOut, status_code=status.HTTP_200_OK)
 def get_sensor(
-    sensor_id: str, service: SensorService = Depends(get_sensor_service)
+    sensor_code: str,
+    service: SensorService = Depends(get_sensor_service),
 ) -> SensorModel:
-    sensor = service.get_sensor(sensor_id)
+
+    sensor = service.get_sensor(sensor_code)
     if not sensor:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Sensor no encontrado"
@@ -42,14 +44,16 @@ def get_sensor(
     return sensor
 
 
-@router.patch("/{sensor_id}", response_model=SensorOut, status_code=status.HTTP_200_OK)
+@router.patch(
+    "/{sensor_code}", response_model=SensorOut, status_code=status.HTTP_200_OK
+)
 def update_sensor(
-    sensor_id: str,
+    sensor_code: str,
     sensor_update: SensorUpdate,
     service: SensorService = Depends(get_sensor_service),
 ) -> SensorModel:
     updated = service.update_sensor(
-        sensor_id, sensor_update.name, sensor_update.location
+        sensor_code, sensor_update.name, sensor_update.location
     )
     if not updated:
         raise HTTPException(
@@ -58,11 +62,11 @@ def update_sensor(
     return updated
 
 
-@router.delete("/{sensor_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{sensor_code}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_sensor(
-    sensor_id: str, service: SensorService = Depends(get_sensor_service)
+    sensor_code: str, service: SensorService = Depends(get_sensor_service)
 ) -> None:
-    success = service.delete_sensor(sensor_id)
+    success = service.delete_sensor(sensor_code)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Sensor no encontrado"

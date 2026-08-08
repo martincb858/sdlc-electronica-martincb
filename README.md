@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Python-3.14+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
   <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git">
+  [![CI](https://github.com/martincb858/sdlc-electronica-martincb/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/martincb858/sdlc-electronica-martincb/actions/workflows/ci.yml)
 </div>
 
 ---

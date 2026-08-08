@@ -5,17 +5,16 @@ Revises:
 Create Date: 2026-08-05 18:36:30.950356
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = 'e33cc85ce971'
-down_revision: Union[str, Sequence[str], None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -32,7 +31,11 @@ def upgrade() -> None:
     )
     with op.batch_alter_table('sensors', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_sensors_code'), ['code'], unique=True)
-        batch_op.create_index(batch_op.f('ix_sensors_sensor_type'), ['sensor_type'], unique=False)
+        batch_op.create_index(
+            batch_op.f('ix_sensors_sensor_type'), 
+            ['sensor_type'], 
+            unique=False
+        )
 
     op.create_table('readings',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -44,7 +47,11 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('readings', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_readings_sensor_id'), ['sensor_id'], unique=False)
+        batch_op.create_index(
+            batch_op.f('ix_readings_sensor_id'), 
+            ['sensor_id'], 
+            unique=False
+        )
 
     # ### end Alembic commands ###
 

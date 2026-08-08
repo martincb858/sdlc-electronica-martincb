@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.db import Base, engine
-from app.routers import reading_router, sensor_router
+from app.routers import health_router, reading_router, sensor_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -14,9 +14,6 @@ app = FastAPI(
     ),
 )
 
-@app.get("/health", tags=["Health"])
-def health_check():
-    return {"status": "ok"}
-
+app.include_router(health_router.router)
 app.include_router(sensor_router.router)
 app.include_router(reading_router.router)

@@ -14,5 +14,9 @@ app = FastAPI(
     ),
 )
 
+@app.get("/health", tags=["Health"])
+def health_check():
+    return {"status": "ok"}
+
 app.include_router(sensor_router.router)
 app.include_router(reading_router.router)

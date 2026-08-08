@@ -3,27 +3,25 @@ from typing import Any
 
 
 class MessageParser(ABC):
-    """
-    Interfaz abstracta para los parsers de mensajes UART.
-    """
+
     
     @abstractmethod
     def can_parse(self, data: bytes) -> bool:
-        """Determina si la trama de bytes corresponde a este protocolo."""
+
         pass
 
     @abstractmethod
     def parse(self, data: bytes) -> dict[str, Any]:
-        """Extrae la información de la trama y la retorna como un diccionario."""
+
         pass
 
 
 class ModbusParser(MessageParser):
-    """Implementación de MessageParser para tramas Modbus RTU."""
+
     
 
     def _calculate_crc(self, data: bytes) -> int:
-        """Calcula el CRC-16 utilizado en Modbus RTU."""
+
         crc = 0xFFFF
         for byte in data:
             crc ^= byte
@@ -36,7 +34,7 @@ class ModbusParser(MessageParser):
         return crc
     
     def can_parse(self, data: bytes) -> bool:
-        """Verifica longitud mínima y CRC válido para Modbus RTU."""
+
         if len(data) < 4:
             return False
             
@@ -47,7 +45,7 @@ class ModbusParser(MessageParser):
         return expected_crc == received_crc
 
     def parse(self, data: bytes) -> dict[str, Any]:
-        """Extrae la dirección, función y payload de la trama Modbus."""
+
         if not self.can_parse(data):
             raise ValueError("Trama Modbus RTU inválida o corrupta")
             
@@ -60,10 +58,8 @@ class ModbusParser(MessageParser):
 
 
 class NMEAParser(MessageParser):
-    """Implementación de MessageParser para sentencias NMEA (ej. $GPGGA)."""
     
     def can_parse(self, data: bytes) -> bool:
-        """Verifica que empiece con '$', termine con '\\r\\n' y tenga un checksum válido."""
         try:
             text = data.decode('ascii')
             if not (text.startswith('$') and text.endswith('\r\n')):
@@ -72,11 +68,11 @@ class NMEAParser(MessageParser):
             if '*' not in text:
                 return False
                 
-            # Separar el contenido del checksum
+
             body, checksum_str = text[1:].rsplit('*', 1)
-            checksum_str = checksum_str.strip()  # Quitar el \r\n
+            checksum_str = checksum_str.strip()
             
-            # El checksum NMEA es un XOR de todos los caracteres entre '$' y '*'
+
             calculated_checksum = 0
             for char in body:
                 calculated_checksum ^= ord(char)
@@ -87,14 +83,14 @@ class NMEAParser(MessageParser):
             return False
 
     def parse(self, data: bytes) -> dict[str, Any]:
-        """Extrae latitud, longitud y calidad de la señal de la sentencia $GPGGA."""
+
         if not self.can_parse(data):
             raise ValueError("Sentencia NMEA inválida o corrupta")
             
         text = data.decode('ascii').strip()
         parts = text.split(',')
         
-        # Estructura base. Si no es GPGGA, devolvemos un diccionario genérico.
+
         result: dict[str, Any] = {
             "protocol": "NMEA",
             "type": parts[0].replace('$', '')
@@ -113,22 +109,19 @@ class NMEAParser(MessageParser):
         return result
 
 class CanParser(MessageParser):
-    """
-    Implementación de MessageParser para tramas CAN simplificadas.
-    Estructura asumida: ID (2 bytes) + DLC (1 byte) + Payload (DLC bytes).
-    """
+
     
     def can_parse(self, data: bytes) -> bool:
-        """Verifica que la longitud total coincida con el campo DLC."""
+
         if len(data) < 3:
             return False
             
         dlc = data[2]
-        # La trama total debe ser exactamente 3 bytes de cabecera + los bytes del payload
+
         return len(data) == (3 + dlc)
 
     def parse(self, data: bytes) -> dict[str, Any]:
-        """Extrae el ID del nodo, el tamaño y los datos del payload."""
+
         if not self.can_parse(data):
             raise ValueError("Trama CAN inválida o longitud incorrecta")
             

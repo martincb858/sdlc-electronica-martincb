@@ -60,7 +60,6 @@ def is_low(r: Reading, threshold: float) -> bool:
 
 # 5. Serialización binaria
 def to_binary_packet(r: Reading) -> bytes:
-    """Serializa la lectura en un formato de bytes compacto [ID_LEN(1B)][ID_STR][TYPE(1B)][VALUE(8B)]"""
     id_bytes = r.sensor_id.encode("utf-8")
     id_len = len(id_bytes).to_bytes(1, byteorder="big")
     type_byte = r.sensor_type.value.to_bytes(1, byteorder="big")

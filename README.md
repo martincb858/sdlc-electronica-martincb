@@ -5,6 +5,9 @@
   <img src="https://img.shields.io/badge/FastAPI-0.115%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
   <img src="https://img.shields.io/badge/SQLAlchemy-2.x-59666C?style=for-the-badge&logo=sqlalchemy&logoColor=white" alt="SQLAlchemy">
   <img src="https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render">
+  <a href="https://github.com/martincb858/sdlc-electronica-martincb/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/martincb858/sdlc-electronica-martincb/ci.yml?branch=main&style=for-the-badge&logo=github" alt="CI">
+  </a>
 </div>
 
 ---

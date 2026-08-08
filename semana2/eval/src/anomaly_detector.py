@@ -9,6 +9,7 @@ class AnomalyType(str, Enum):
     HUMEDAD = "ANOMALIA_HUMEDAD"
     TEMPERATURA_Y_HUMEDAD = "ANOMALIA_TEMPERATURA_Y_HUMEDAD"
 
+
 class AnomalyDetector:
     def __init__(self, temp_threshold: float, hum_threshold: float):
         self.temp_threshold = temp_threshold

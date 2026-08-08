@@ -12,7 +12,7 @@ from sqlalchemy.orm import (
 
 
 def get_database_url() -> str:
-    
+
     url = os.getenv("DATABASE_URL", "sqlite:///sensorhub.db")
     if url.startswith("postgres://"):
         return url.replace("postgres://", "postgresql+psycopg://", 1)
@@ -63,9 +63,7 @@ class ReadingModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    sensor_id: Mapped[str] = mapped_column(
-        ForeignKey("sensors.code"), index=True
-    )
+    sensor_id: Mapped[str] = mapped_column(ForeignKey("sensors.code"), index=True)
 
     value: Mapped[float]
     unit: Mapped[str]

@@ -11,5 +11,6 @@ class SensorRegistry:
         if sensor_id not in self._sensors:
             raise SensorNotFoundError(f"Sensor '{sensor_id}' no está registrado.")
 
+
 class SensorNotFoundError(Exception):
     pass

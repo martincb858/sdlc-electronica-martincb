@@ -7,9 +7,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # Corre las migraciones antes de levantar el servidor. Render usa su
-    # propio preDeployCommand para esto (ver render.yaml); docker-compose
-    # no tiene ese concepto, asi que se hace via command override.
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
   db:
     image: postgres:16

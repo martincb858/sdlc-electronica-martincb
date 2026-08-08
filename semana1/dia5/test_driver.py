@@ -13,7 +13,6 @@ from recorder import DataRecorder
 def test_uart_config_invalid_baudrate_raises_error() -> None:
     with pytest.raises(ValueError, match="no es estándar"):
         UartConfig(baudrate=1234, parity="N", stop_bits=1, timeout=1.0)
-    
 
 
 def test_uart_config_is_immutable() -> None:
@@ -73,13 +72,11 @@ def test_data_recorder_writes_json_lines(tmp_path: Path) -> None:
     file_path = tmp_path / "test_logs.jsonl"
     recorder = DataRecorder(file_path)
 
-
     data1 = {"protocol": "NMEA", "latitude": "4807.038"}
     data2 = {"protocol": "Modbus RTU", "address": 1}
 
     recorder.record(data1)
     recorder.record(data2)
-
 
     with open(file_path, encoding="utf-8") as f:
         lines = f.readlines()

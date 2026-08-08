@@ -1,39 +1,112 @@
-# 🛠️ SDLC Electrónica - Martín
+﻿# 🛠️ SDLC Electrónica - Martín
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Python-3.14+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
-  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git">
-  
-  <a href="https://github.com/martincb858/sdlc-electronica-martincb/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/martincb858/sdlc-electronica-martincb/ci.yml?branch=main&style=for-the-badge&logo=github" alt="CI">
-  </a>
-  
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
+  <img src="https://img.shields.io/badge/FastAPI-0.115%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/SQLAlchemy-2.x-59666C?style=for-the-badge&logo=sqlalchemy&logoColor=white" alt="SQLAlchemy">
+  <img src="https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render">
 </div>
 
 ---
 
-## 📝 Descripción del Proyecto
-Este repositorio contiene el flujo de desarrollo, testing y validación de software para sistemas electrónicos y sensores. Implementa buenas prácticas de desarrollo de software (SDLC) incluyendo tipado estático, análisis de código automático y pruebas unitarias automáticas.
+## 📝 Descripción del proyecto
+Este repositorio reúne una serie de ejercicios y una API real para el desarrollo de software con enfoque en calidad, pruebas y buenas prácticas. El proyecto principal es una API REST con FastAPI para gestionar sensores IoT y sus lecturas, con validaciones de dominio y soporte para despliegue en Render.
 
 ---
 
-## 🚀 Arquitectura y Herramientas
-
-El proyecto está validado bajo el siguiente stack de desarrollo:
-
-* **⚡ FastAPI & Uvicorn:** Para la arquitectura de servicios y endpoints.
-* **🧪 Pytest & Pytest-Cov:** Entorno de pruebas unitarias y reportes de cobertura de código.
-* **🦊 Ruff:** Linter y formateador de código ultra rápido.
-* **🛡️ Mypy:** Verificador de tipado estático para evitar errores en tiempo de ejecución.
+## ✨ Funcionalidades principales
+- Gestión de sensores: crear, listar, consultar, actualizar y eliminar.
+- Gestión de lecturas: registrar historiales por sensor y consultar lecturas individuales.
+- Validaciones de negocio por tipo de sensor.
+- Endpoints de salud para monitoreo.
+- Configuración preparada para base de datos y despliegue en producción.
 
 ---
 
-## 🛠️ Configuración del Entorno Local
+## 🚀 Stack utilizado
+- Python 3.10+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- Alembic
+- Pytest
+- Ruff
+- Mypy
 
-Sigue estos pasos para clonar el repositorio e instalar el entorno virtual aislado:
+---
+
+## 🧱 Estructura del proyecto
+- app/: aplicación FastAPI, routers, servicios, esquemas y modelo de base de datos.
+- migrations/: migraciones de Alembic.
+- tests/: pruebas de la API y de la lógica de negocio.
+- semana1/, semana2/: ejercicios y prácticas de SDLC, diseño y testing.
+
+---
+
+## 🛠️ Instalación local
 
 ### 1. Clonar el repositorio
 ```bash
-git clone [https://github.com/martincb858/sdlc-electronica-martincb.git](https://github.com/martincb858/sdlc-electronica-martincb.git)
+git clone https://github.com/martincb858/sdlc-electronica-martincb.git
 cd sdlc-electronica-martincb
+```
+
+### 2. Crear y activar un entorno virtual
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+En Windows PowerShell:
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3. Instalar dependencias
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## ▶️ Ejecutar la API localmente
+```bash
+uvicorn app.main:app --reload
+```
+
+La API quedará disponible en:
+- http://127.0.0.1:8000/docs
+- http://127.0.0.1:8000/health
+
+---
+
+## 🧪 Ejecutar pruebas
+```bash
+pytest
+```
+
+---
+
+## 🌐 API desplegada en Render
+La versión publicada actualmente está disponible en:
+
+https://sensorhub-api-7bkq.onrender.com/
+
+Endpoints útiles:
+- /health
+- /docs
+- /sensors
+- /sensors/{sensor_code}/readings
+
+---
+
+## 🐳 Ejecutar con Docker
+```bash
+docker compose up --build
+```
+
+---
+
+## 📌 Notas
+El despliegue en Render está configurado con Alembic para aplicar migraciones automáticamente antes de iniciar la aplicación.

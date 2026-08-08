@@ -4,10 +4,11 @@
   <img src="https://img.shields.io/badge/Python-3.14+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
   <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git">
-  <a href="https://github.com/martincb858/sdlc-electronica-martincb/actions/workflows/ci.yml>">
-    <img src="https://img.shields.io/github/actions/workflow/status/martincb858/sdlc-electronica-martincb/actions/workflows/ci.yml>?style=for-the-badge&logo=github" alt="GitHub Actions CI">
+  
+  <a href="https://github.com/martincb858/sdlc-electronica-martincb/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/martincb858/sdlc-electronica-martincb/ci.yml?branch=main&style=for-the-badge&logo=github" alt="CI">
   </a>
-
+  
 </div>
 
 ---

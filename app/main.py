@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 from app.routers import health_router, reading_router, sensor_router
 
-
 app = FastAPI(
     title="SensorHub API",
     version="0.3.0",

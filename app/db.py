@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 
 from sqlalchemy import ForeignKey, create_engine
@@ -9,7 +10,24 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 
-engine = create_engine("sqlite:///sensorhub.db", echo=False)
+
+def get_database_url() -> str:
+    
+    url = os.getenv("DATABASE_URL", "sqlite:///sensorhub.db")
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://") and "+psycopg" not in url:
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
+DATABASE_URL = get_database_url()
+
+_connect_args = (
+    {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+)
+
+engine = create_engine(DATABASE_URL, echo=False, connect_args=_connect_args)
 
 
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
@@ -45,7 +63,9 @@ class ReadingModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    sensor_id: Mapped[str] = mapped_column(ForeignKey("sensors.code"), index=True)
+    sensor_id: Mapped[str] = mapped_column(
+        ForeignKey("sensors.code"), index=True
+    )
 
     value: Mapped[float]
     unit: Mapped[str]

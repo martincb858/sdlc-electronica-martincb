@@ -78,3 +78,86 @@ Mi uso de la IA fue exhaustivo, actuando como compañero de depuración (pair-pr
 > Este ha sido el día de mayor uso de IA, pero también el día de mayor asimilación técnica. Los errores que experimenté al inicio me forzaron a deconstruir lo que había hecho en los días previos. Por fin logré interiorizar *por qué* separamos el código: mantener los routers limpios, delegar la lógica a los servicios y el manejo de datos a los repositorios. 
 > 
 > La IA fue instrumental no solo para proveer ejemplos, sino para explicarme la filosofía detrás del diseño de software. Superar este desafío con SensorHub me ayudó a corregir la integración "sencilla pero frágil" que tenía antes, dejándome con conocimientos mucho más sólidos, estructurados y listos para ser aplicados en proyectos futuros.
+
+
+# Bitácora de Inteligencia Artificial - Semana 4
+
+---
+
+## [2026-08-04] — Entrada 1: Dockerización y Arquitectura de Contenedores
+
+### Lo que aprendí e Implementaciones
+Este día me enfoqué en el despliegue mediante contenedores. Comprendí que el orden de las instrucciones en el `Dockerfile` es crítico para optimizar los tiempos de construcción mediante la caché de capas. Implementé una imagen ligera (`python:3.12-slim`) y configuré el entorno para separar la instalación de dependencias del código fuente. Logré construir y ejecutar mi servicio **SensorHub** localmente utilizando `docker build` y `docker run`.
+
+### Prompts y Uso de IA
+Utilicé la IA para optimizar mi flujo de trabajo con Docker:
+*  **Optimización:** Le pedí que revisara mi `Dockerfile` para asegurar que el orden de `COPY` y `RUN` fuera el más eficiente para aprovechar la caché de capas.
+*  **Depuración de Entorno:** Consulté sobre cómo manejar correctamente la variable `DATABASE_URL` para que el contenedor funcionara tanto en desarrollo (SQLite) como en producción (PostgreSQL).
+*  **Buenas Prácticas:** Pedí explicaciones sobre por qué se prefiere `python:slim` sobre la imagen completa para entornos de microservicios.
+
+### Reflexión
+> Entender que el `Dockerfile` funciona por capas cambió mi perspectiva sobre el desarrollo. Al principio, reconstruía todo ante cualquier cambio; ahora, al separar las dependencias en una capa, el desarrollo es mucho más ágil. Es un primer paso fundamental para garantizar que el software funcione igual en mi computadora que en el servidor.
+
+---
+
+## [2026-08-06] — Entrada 2: Docker Compose, PostgreSQL y Migraciones con Alembic
+
+### Lo que aprendí e Implementaciones
+Día de integración compleja. Implementé `docker-compose.yml` para orquestar la API con una base de datos PostgreSQL, gestionando volúmenes para la persistencia de datos (`pgdata`). Aprendí la importancia del driver `psycopg` para conectar SQLAlchemy con Postgres y normalicé la cadena de conexión en `db.py` para asegurar compatibilidad entre entornos. Finalmente, inicialicé **Alembic** para gestionar el versionado de mi esquema de base de datos.
+
+### Prompts y Uso de IA
+La IA fue clave para navegar los errores de conectividad:
+*  **Solución de Errores:** Cuando obtuve un `ModuleNotFoundError` con psycopg, la IA me explicó la diferencia entre `psycopg2` y el nuevo `psycopg` (driver binario).
+*  **Refactorización:** Pedí ayuda para escribir una función en `db.py` que detectara y normalizara automáticamente la URL de la base de datos, manejando los prefijos `postgres://` vs `postgresql+psycopg://`.
+*  **Alembic:** Solicité una guía paso a paso para configurar el versionado inicial sin borrar mis datos de prueba locales.
+
+### Reflexión
+> La gestión de bases de datos siempre me había parecido una tarea manual y arriesgada. Con Alembic, siento que he pasado de "intentar no romper la base de datos" a tener un control real y auditable sobre ella. La orquestación con Docker Compose facilita enormemente el testing, permitiéndome levantar todo el ecosistema con un solo comando.
+
+---
+
+## [2026-08-06] — Entrada 3: CI/CD y Calidad de Código con GitHub Actions
+
+### Lo que aprendí e Implementaciones
+Aprendí a automatizar la validación de mi código. Implementé un pipeline de **GitHub Actions** que se dispara con cada `push` a `main`. El pipeline incluye: *Linting* (Ruff), validación de tipos (Mypy) y pruebas unitarias con cobertura (Pytest + Cov). Aprendí que un CI bien configurado no solo detecta errores, sino que actúa como una red de seguridad antes de cualquier despliegue.
+
+### Prompts y Uso de IA
+La IA actuó como guía de arquitectura de pruebas:
+*  **CI/CD:** Le pedí que estructurara mi archivo `.github/workflows/ci.yml` para incluir las distintas etapas de validación (linting, types, tests).
+*  **Simulación de Fallos:** Le pregunté cómo escribir pruebas que forzaran una falla para verificar que el pipeline de GitHub Actions realmente detuviera un despliegue con código roto.
+*  **Métricas:** Consulté cómo interpretar el reporte de cobertura de `pytest-cov` y cómo configurar el `fail-under=80` para mantener la calidad.
+
+### Reflexión
+> "Romper algo a propósito" para ver el CI fallar fue revelador. Me di cuenta de que un pipeline de CI no es solo un requisito burocrático, sino una herramienta de confianza. Ahora entiendo qué le responderé al coordinador cuando pregunte qué protege mi código: la automatización es mi primer filtro de calidad.
+
+---
+
+## [2026-08-07] — Entrada 4: Despliegue en la Nube con Render
+
+### Lo que aprendí e Implementaciones
+Logré el despliegue real de la API en **Render** usando infraestructura como código (`render.yaml`). Comprendí el concepto de "despertar" el servicio (cold start) y la importancia de configurar migraciones de base de datos en el comando de arranque del servidor. Ahora, cualquier cambio enviado a GitHub se despliega automáticamente, logrando una URL pública para **SensorHub**.
+
+### Prompts y Uso de IA
+*  **Infraestructura:** Pedí ayuda para traducir mi configuración de `docker-compose` al formato `render.yaml` de Render.
+*  **Despliegue:** Consulté cómo concatenar comandos (`alembic upgrade head && uvicorn...`) para asegurar que la base de datos esté siempre migrada antes de que la aplicación reciba tráfico.
+*  **Diagnóstico:** Pregunté sobre por qué la API tardaba en responder después de un tiempo de inactividad, aprendiendo sobre los límites del "free tier".
+
+### Reflexión
+> Ver mi API funcionando con una URL pública fue el cierre perfecto. Logré entender que el despliegue no es el final de la cadena, sino una extensión de todo lo hecho anteriormente. La combinación de Docker, Alembic y CI/CD hizo que el despliegue en la nube fuera un proceso fluido y profesional, lejos de las configuraciones manuales de antaño.
+
+
+## [2026-08-08] — Entrada 5: Evaluación 2 - Pipeline de Producción de SensorHub
+
+### Lo que aprendí e Implementaciones
+Este día representó la cúspide de la integración y validación de todo lo construido durante la semana. Enfrenté el reto de consolidar el pipeline de producción completo para **SensorHub**. Perfeccioné el uso de variables de entorno para garantizar cero secretos en el historial del repositorio, integré el badge de estado del pipeline de CI en el README y aseguré que tanto el endpoint `/health` como la documentación interactiva en `/docs` estuvieran accesibles en la URL pública de Render. 
+
+Comprendí a fondo la importancia de verificar que el despliegue continuo respondiera en tiempo real a cada commit enviado a la rama principal, manteniendo una cobertura de pruebas estricta superior al 80%.
+
+### Prompts y Uso de IA
+Mi uso de la IA se centró en la validación final de los entregables y la resolución de detalles finos de configuración:
+*  **Auditoría de Entregables:** Le pedí que revisara la lista de requisitos de la evaluación para confirmar que no faltara ningún archivo crítico en el repositorio (como la correcta estructura del `render.yaml` y el `docker-compose.yml`).
+*  **Inclusión de Badges:** Consulté la sintaxis exacta en Markdown para generar y colocar el badge de GitHub Actions en el README apuntando correctamente al estado del pipeline de CI.
+*  **Verificación de Seguridad:** Validé con su ayuda las mejores prácticas para asegurar que ninguna credencial o variable sensible quedara expuesta en el historial de commits antes de realizar la entrega final.
+
+### Reflexión
+> Ver la evaluación integrada de esta manera me dio una perspectiva profesional del ciclo de vida del software. No se trata solo de escribir código que funcione en local, sino de asegurar la reproducibilidad con Docker, la integridad con las migraciones y pruebas, y la automatización total con CI/CD y despliegue continuo. Superar esta evaluación con una URL pública funcional y un pipeline en verde consolidó todo lo aprendido en una solución robusta y lista para producción.

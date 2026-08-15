@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
@@ -10,13 +11,34 @@ from app.services.reading_service import ReadingService, SensorNotFoundError
 router = APIRouter(tags=["readings"])
 
 
+def _responses(*codes: int) -> dict[int | str, dict[str, Any]]:
+    """Arma el dict de `responses=` para el decorador a partir de codigos
+    HTTP conocidos, evitando repetir el texto de cada descripcion.
+    """
+    descriptions = {
+        status.HTTP_400_BAD_REQUEST: (
+            "Datos invalidos (unidad incompatible, fuera de rango "
+            "operacional, etc.)"
+        ),
+        status.HTTP_404_NOT_FOUND: "Sensor o lectura no encontrado",
+    }
+    return {code: {"description": descriptions[code]} for code in codes}
+
+
 @router.get(
     "/sensors/{sensor_code}/readings",
     response_model=list[ReadingOut],
     status_code=status.HTTP_200_OK,
+    responses=_responses(status.HTTP_404_NOT_FOUND, status.HTTP_400_BAD_REQUEST),
 )
 def list_readings(
-    sensor_code: str = Path(..., min_length=1, max_length=50, description="Código del sensor"),
+    *,
+    sensor_code: str = Path(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Código del sensor",
+    ),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     from_date: datetime | None = Query(None, description="Fecha inicial del rango"),
@@ -43,10 +65,17 @@ def list_readings(
     "/sensors/{sensor_code}/readings",
     response_model=ReadingOut,
     status_code=status.HTTP_201_CREATED,
+    responses=_responses(status.HTTP_404_NOT_FOUND, status.HTTP_400_BAD_REQUEST),
 )
 def create_reading(
-    sensor_code: str = Path(..., min_length=1, max_length=50, description="Código del sensor"),
-    reading: ReadingCreate = ...,
+    reading: ReadingCreate,
+    *,
+    sensor_code: str = Path(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Código del sensor",
+    ),
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingModel:
     try:
@@ -63,9 +92,7 @@ def create_reading(
     "/readings/{reading_id}",
     response_model=ReadingOut,
     status_code=status.HTTP_200_OK,
-    responses={
-        status.HTTP_404_NOT_FOUND: {"description": "Lectura no encontrada"},
-    },
+    responses=_responses(status.HTTP_404_NOT_FOUND),
 )
 def get_reading(
     reading_id: int = Path(..., ge=1, description="ID de la lectura"),
@@ -83,22 +110,14 @@ def get_reading(
     "/readings/{reading_id}",
     response_model=ReadingOut,
     status_code=status.HTTP_200_OK,
-    responses={
-        status.HTTP_400_BAD_REQUEST: {"description": "Datos de actualización inválidos"},
-        status.HTTP_404_NOT_FOUND: {"description": "Lectura no encontrada"},
-    },
+    responses=_responses(status.HTTP_404_NOT_FOUND, status.HTTP_400_BAD_REQUEST),
 )
 def update_reading(
+    reading_update: ReadingUpdate,
+    *,
     reading_id: int = Path(..., ge=1, description="ID de la lectura"),
-    reading_update: ReadingUpdate = ...,
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingModel:
-    if reading_update.value is None and reading_update.unit is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Debe proporcionar al menos un campo para actualizar ('value' o 'unit')",
-        )
-
     try:
         updated = service.update_reading(
             reading_id, reading_update.value, reading_update.unit
@@ -119,9 +138,7 @@ def update_reading(
 @router.delete(
     "/readings/{reading_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    responses={
-        status.HTTP_404_NOT_FOUND: {"description": "Lectura no encontrada"},
-    },
+    responses=_responses(status.HTTP_404_NOT_FOUND),
 )
 def delete_reading(
     reading_id: int = Path(..., ge=1, description="ID de la lectura"),

@@ -67,6 +67,9 @@ class ReadingService:
         to_date: datetime | None = None,
     ) -> list[ReadingModel]:
 
+        if self._sensor_repo.get_by_code(sensor_id) is None:
+            raise SensorNotFoundError(f"Sensor '{sensor_id}' no encontrado.")
+
         return self._repo.list_for_sensor(sensor_id, limit, offset, from_date, to_date)
 
     def get_reading(self, reading_id: int) -> ReadingModel | None:

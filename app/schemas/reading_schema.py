@@ -9,10 +9,6 @@ class ReadingCreate(BaseModel):
     value: float = Field(..., description="Valor medido por el sensor", examples=[24.5])
     unit: str = Field(default="C", description="Unidad de medida", examples=["C"])
 
-    # Inyectado como atributo de clase para no romper la firma que espera
-    # Pydantic (BaseModel no admite __init__ custom fácilmente), pero sigue
-    # siendo reemplazable: `ReadingCreate._physics_registry = otro_registro`
-    # en tests o en otro despliegue, sin tocar esta clase.
     _physics_registry: ValidatorRegistry = physics_registry
 
     @model_validator(mode="after")
@@ -27,6 +23,13 @@ class ReadingCreate(BaseModel):
 class ReadingUpdate(BaseModel):
     value: float | None = Field(default=None, examples=[25.1])
     unit: str | None = Field(default=None, examples=["C"])
+
+    @model_validator(mode="after")
+    def require_at_least_one_field(self) -> "ReadingUpdate":
+        if self.value is None and self.unit is None:
+            raise ValueError(
+            )
+        return self
 
 
 class ReadingOut(BaseModel):

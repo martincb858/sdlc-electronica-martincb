@@ -4,7 +4,7 @@
 Aceptado
 
 ## Contexto
-Necesitamos cambiar de base de datos y testear la logica sin infraestructura.
+Necesitamos cambiar de base de datos y testear la logica sin infraestructura. Basado en las observaciones y revisiones de diseño documentadas en `semana5/AI_CODE_REVIEW.md`.
 
 ## Decision
 routers -> services -> repositories -> models, con el repositorio detras

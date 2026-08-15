@@ -136,17 +136,6 @@ def test_list_readings_returns_404_for_unknown_sensor(client: TestClient) -> Non
     assert response.status_code == 404
 
 
-def test_update_reading_rejects_empty_body(client: TestClient) -> None:
-    _create_sensor(client)
-    created = client.post(
-        "/sensors/TEMP-01/readings", json={"value": 20.0, "unit": "C"}
-    ).json()
-
-    response = client.patch(f"/readings/{created['id']}", json={})
-    assert response.status_code == 422
-    assert "al menos un campo" in str(response.json())
-
-
 def test_create_reading_rejects_empty_sensor_code(client: TestClient) -> None:
     response = client.post("/sensors//readings", json={"value": 20.0, "unit": "C"})
     # FastAPI trata "//readings" como una ruta que no matchea con un

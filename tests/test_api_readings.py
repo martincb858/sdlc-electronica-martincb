@@ -53,7 +53,6 @@ def test_create_reading_rejects_unit_incompatible_with_sensor_type(
 ) -> None:
     _create_sensor(client, code="TEMP-01", sensor_type="TEMPERATURE")
 
-    # RH es una unidad físicamente válida, pero no para un sensor TEMPERATURE.
     response = client.post(
         "/sensors/TEMP-01/readings", json={"value": 50.0, "unit": "RH"}
     )
@@ -128,3 +127,52 @@ def test_delete_reading(client: TestClient) -> None:
 def test_delete_reading_returns_404_if_missing(client: TestClient) -> None:
     response = client.delete("/readings/999")
     assert response.status_code == 404
+
+
+def test_list_readings_returns_404_for_unknown_sensor(client: TestClient) -> None:
+    # Antes, get_history() nunca verificaba que el sensor existiera, asi
+    # que esto devolvia 200 con una lista vacia en vez de 404.
+    response = client.get("/sensors/NOPE/readings")
+    assert response.status_code == 404
+
+
+def test_update_reading_rejects_empty_body(client: TestClient) -> None:
+    _create_sensor(client)
+    created = client.post(
+        "/sensors/TEMP-01/readings", json={"value": 20.0, "unit": "C"}
+    ).json()
+
+    response = client.patch(f"/readings/{created['id']}", json={})
+    assert response.status_code == 422
+    assert "al menos un campo" in str(response.json())
+
+
+def test_create_reading_rejects_empty_sensor_code(client: TestClient) -> None:
+    response = client.post("/sensors//readings", json={"value": 20.0, "unit": "C"})
+    # FastAPI trata "//readings" como una ruta que no matchea con un
+    # segmento vacio -> 404 de enrutamiento, no 422. Se deja explicito
+    # para documentar el comportamiento real observado.
+    assert response.status_code == 404
+
+
+def test_list_readings_rejects_sensor_code_too_long(client: TestClient) -> None:
+    long_code = "X" * 51
+    response = client.get(f"/sensors/{long_code}/readings")
+    assert response.status_code == 422
+
+
+def test_openapi_documents_error_responses_for_reading_endpoints(
+    client: TestClient,
+) -> None:
+    paths = client.get("/openapi.json").json()["paths"]
+
+    create_responses = paths["/sensors/{sensor_code}/readings"]["post"]["responses"]
+    assert "404" in create_responses
+    assert "400" in create_responses
+
+    update_responses = paths["/readings/{reading_id}"]["patch"]["responses"]
+    assert "404" in update_responses
+    assert "400" in update_responses
+
+    delete_responses = paths["/readings/{reading_id}"]["delete"]["responses"]
+    assert "404" in delete_responses

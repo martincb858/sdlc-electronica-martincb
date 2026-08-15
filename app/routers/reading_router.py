@@ -80,13 +80,25 @@ def get_reading(
 
 
 @router.patch(
-    "/readings/{reading_id}", response_model=ReadingOut, status_code=status.HTTP_200_OK
+    "/readings/{reading_id}",
+    response_model=ReadingOut,
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "Datos de actualización inválidos"},
+        status.HTTP_404_NOT_FOUND: {"description": "Lectura no encontrada"},
+    },
 )
 def update_reading(
     reading_id: int = Path(..., ge=1, description="ID de la lectura"),
     reading_update: ReadingUpdate = ...,
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingModel:
+    if reading_update.value is None and reading_update.unit is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Debe proporcionar al menos un campo para actualizar ('value' o 'unit')",
+        )
+
     try:
         updated = service.update_reading(
             reading_id, reading_update.value, reading_update.unit

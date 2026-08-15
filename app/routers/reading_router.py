@@ -12,9 +12,6 @@ router = APIRouter(tags=["readings"])
 
 
 def _responses(*codes: int) -> dict[int | str, dict[str, Any]]:
-    """Arma el dict de `responses=` para el decorador a partir de codigos
-    HTTP conocidos, evitando repetir el texto de cada descripcion.
-    """
     descriptions = {
         status.HTTP_400_BAD_REQUEST: (
             "Datos invalidos (unidad incompatible, fuera de rango "
@@ -41,8 +38,14 @@ def list_readings(
     ),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    from_date: datetime | None = Query(None, description="Fecha inicial del rango"),
-    to_date: datetime | None = Query(None, description="Fecha final del rango"),
+    from_date: datetime | None = Query(
+        None, 
+        description="Fecha inicial del rango"
+    ),
+    to_date: datetime | None = Query(
+        None, 
+        description="Fecha final del rango"
+    ),
     service: ReadingService = Depends(get_reading_service),
 ) -> list[ReadingModel]:
     if from_date and to_date and from_date > to_date:
@@ -52,7 +55,12 @@ def list_readings(
         )
 
     try:
-        return service.get_history(sensor_code, limit, offset, from_date, to_date)
+        return service.get_history(
+            sensor_code, 
+            limit, offset, 
+            from_date, 
+            to_date
+        )
     except SensorNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except ValueError as e:
@@ -79,7 +87,11 @@ def create_reading(
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingModel:
     try:
-        return service.record(sensor_code, reading.value, reading.unit)
+        return service.record(
+            sensor_code, 
+            reading.value, 
+            reading.unit
+        )
     except SensorNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except ValueError as e:
@@ -95,7 +107,11 @@ def create_reading(
     responses=_responses(status.HTTP_404_NOT_FOUND),
 )
 def get_reading(
-    reading_id: int = Path(..., ge=1, description="ID de la lectura"),
+    reading_id: int = Path(
+        ...,
+        ge=1, 
+        description="ID de la lectura"
+    ),
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingModel:
     reading = service.get_reading(reading_id)
@@ -115,7 +131,11 @@ def get_reading(
 def update_reading(
     reading_update: ReadingUpdate,
     *,
-    reading_id: int = Path(..., ge=1, description="ID de la lectura"),
+    reading_id: int = Path(
+        ...,
+        ge=1, 
+        description="ID de la lectura"
+    ),
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingModel:
     try:
@@ -141,7 +161,11 @@ def update_reading(
     responses=_responses(status.HTTP_404_NOT_FOUND),
 )
 def delete_reading(
-    reading_id: int = Path(..., ge=1, description="ID de la lectura"),
+    reading_id: int = Path(
+        ..., 
+        ge=1, 
+        description="ID de la lectura"
+    ),
     service: ReadingService = Depends(get_reading_service),
 ) -> None:
     success = service.delete_reading(reading_id)

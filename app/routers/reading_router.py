@@ -116,7 +116,13 @@ def update_reading(
         ) from e
 
 
-@router.delete("/readings/{reading_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/readings/{reading_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Lectura no encontrada"},
+    },
+)
 def delete_reading(
     reading_id: int = Path(..., ge=1, description="ID de la lectura"),
     service: ReadingService = Depends(get_reading_service),

@@ -60,7 +60,12 @@ def create_reading(
 
 
 @router.get(
-    "/readings/{reading_id}", response_model=ReadingOut, status_code=status.HTTP_200_OK
+    "/readings/{reading_id}",
+    response_model=ReadingOut,
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Lectura no encontrada"},
+    },
 )
 def get_reading(
     reading_id: int = Path(..., ge=1, description="ID de la lectura"),

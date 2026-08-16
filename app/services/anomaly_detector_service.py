@@ -1,18 +1,28 @@
+from collections.abc import Sequence
+
 from app.domain.alerts import AlertStrategy
 
 
 class AnomalyDetectorService:
+    """Servicio de dominio para detectar anomalías y disparar alertas."""
+
     def __init__(
         self,
-        alert_strategy: AlertStrategy,
+        alert_strategy: AlertStrategy | Sequence[AlertStrategy],
         thresholds: dict[str, float] | None = None,
     ) -> None:
-        self._alert_strategy = alert_strategy
-        self._thresholds = thresholds or {}
+        if isinstance(alert_strategy, Sequence):
+            self._alert_strategies: list[AlertStrategy] = list(alert_strategy)
+        else:
+            self._alert_strategies = [alert_strategy]
+        self._thresholds: dict[str, float] = thresholds or {}
 
     def process_reading(self, sensor_id: str, value: float) -> None:
-        """Procesa una lectura y evalúa si supera el umbral configurado.
+        """Evalúa si el valor leído supera el umbral configurado y notifica."""
+        threshold = self._thresholds.get(sensor_id)
+        if threshold is None:
+            return
 
-        Fase RED: La lógica aún no está implementada para permitir que las pruebas fallen.
-        """
-        pass
+        if value > threshold:
+            for strategy in self._alert_strategies:
+                strategy.notify(sensor_id, value, threshold)

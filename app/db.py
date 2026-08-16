@@ -53,6 +53,9 @@ class SensorModel(Base):
     readings: Mapped[list["ReadingModel"]] = relationship(
         back_populates="sensor", cascade="all, delete-orphan"
     )
+    alerts: Mapped[list["AlertModel"]] = relationship(
+        back_populates="sensor", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<Sensor(id={self.id}, code='{self.code}', type='{self.sensor_type}')>"
@@ -78,4 +81,25 @@ class ReadingModel(Base):
         return (
             f"<Reading(id={self.id}, sensor='{self.sensor_id}', "
             f"val={self.value}{self.unit})>"
+        )
+
+
+class AlertModel(Base):
+    __tablename__ = "alerts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    sensor_id: Mapped[str] = mapped_column(ForeignKey("sensors.code"), index=True)
+    value: Mapped[float]
+    threshold: Mapped[float]
+
+    created_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc)
+    )
+
+    sensor: Mapped["SensorModel"] = relationship(back_populates="alerts")
+
+    def __repr__(self) -> str:
+        return (
+            f"<Alert(id={self.id}, sensor='{self.sensor_id}', "
+            f"value={self.value}, threshold={self.threshold})>"
         )

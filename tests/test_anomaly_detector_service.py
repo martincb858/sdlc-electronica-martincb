@@ -74,7 +74,9 @@ def test_process_reading_ignores_sensors_without_threshold() -> None:
     mock_strategy.notify.assert_not_called()
 
 
-def test_console_alert_strategy_prints_alert(capsys: pytest.CaptureFixture[str]) -> None:
+def test_console_alert_strategy_prints_alert(
+        capsys: pytest.CaptureFixture[str]
+    ) -> None:
     strategy = ConsoleAlertStrategy()
     strategy.notify("TEMP-01", 45.0, 40.0)
 

@@ -161,3 +161,92 @@ Mi uso de la IA se centró en la validación final de los entregables y la resol
 
 ### Reflexión
 > Ver la evaluación integrada de esta manera me dio una perspectiva profesional del ciclo de vida del software. No se trata solo de escribir código que funcione en local, sino de asegurar la reproducibilidad con Docker, la integridad con las migraciones y pruebas, y la automatización total con CI/CD y despliegue continuo. Superar esta evaluación con una URL pública funcional y un pipeline en verde consolidó todo lo aprendido en una solución robusta y lista para producción.
+
+Bitácora de Inteligencia Artificial - Semana 5
+
+---
+
+## [2026-08-04] — Entrada 1:  Aider: IA con trazabilidad Git
+
+### Observaciones:
+Aider me parece una herramienta bastante util ya que es muy intuitiva y facil de utilizar al igual que copilot, realmente no he utilizado copilot lo suficiente para claramente encontrar diferencias   puntuales, pero personalmente creo que en comparacion a copilot aider es bastante mas versatil, ya que puedes utilizar diferentes modelos, que en el caso de copilot, ademas de que genera automaticamente los commit de las cosas que realiza, esto ayuda muchisimo en el desarrollo.
+
+Personalmente creo que aider falla bastante en tomar el contexto de otros archivos, cosa que copilot hace automaticamente y lo hace de manera muy eficiente.
+
+
+### Prompts y Uso de IA
+Utilicé la IA para optimizar mi flujo de trabajo con Docker:
+*  **Optimización:** Le pedí que revisara mi `Dockerfile` para asegurar que el orden de `COPY` y `RUN` fuera el más eficiente para aprovechar la caché de capas.
+*  **Depuración de Entorno:** Consulté sobre cómo manejar correctamente la variable `DATABASE_URL` para que el contenedor funcionara tanto en desarrollo (SQLite) como en producción (PostgreSQL).
+*  **Buenas Prácticas:** Pedí explicaciones sobre por qué se prefiere `python:slim` sobre la imagen completa para entornos de microservicios.
+
+### Reflexión
+> Entender que el `Dockerfile` funciona por capas cambió mi perspectiva sobre el desarrollo. Al principio, reconstruía todo ante cualquier cambio; ahora, al separar las dependencias en una capa, el desarrollo es mucho más ágil. Es un primer paso fundamental para garantizar que el software funcione igual en mi computadora que en el servidor.
+
+---
+
+---
+
+## [2026-08-04] — Entrada 1:  Aider: IA con trazabilidad Git
+
+### Observaciones:
+Aider me parece una herramienta bastante util ya que es muy intuitiva y facil de utilizar al igual que copilot, realmente no he utilizado copilot lo suficiente para claramente encontrar diferencias  puntuales, pero personalmente creo que en comparacion a copilot aider es bastante mas versatil, ya que puedes utilizar diferentes modelos, que en el caso de copilot, ademas de que genera automaticamente los commit de las cosas que realiza, esto ayuda muchisimo en el desarrollo.
+
+Personalmente creo que aider falla bastante en tomar el contexto de otros archivos, cosa que copilot hace automaticamente y lo hace de manera muy eficiente.
+
+
+### Prompts y Uso de IA
+Utilicé la IA para optimizar mi flujo de trabajo con Docker:
+*  **Optimización:** Le pedí que revisara mi `Dockerfile` para asegurar que el orden de `COPY` y `RUN` fuera el más eficiente para aprovechar la caché de capas.
+*  **Depuración de Entorno:** Consulté sobre cómo manejar correctamente la variable `DATABASE_URL` para que el contenedor funcionara tanto en desarrollo (SQLite) como en producción (PostgreSQL).
+*  **Buenas Prácticas:** Pedí explicaciones sobre por qué se prefiere `python:slim` sobre la imagen completa para entornos de microservicios.
+
+### Reflexión
+> Entender que el `Dockerfile` funciona por capas cambió mi perspectiva sobre el desarrollo. Al principio, reconstruía todo ante cualquier cambio; ahora, al separar las dependencias en una capa, el desarrollo es mucho más ágil. Es un primer paso fundamental para garantizar que el software funcione igual en mi computadora que en el servidor.
+
+---
+
+## [2026-08-05] — Entrada 2: Code review y tests con IA
+
+### Observaciones:
+Someter el código a un "code review" simulado por una IA como si fuera un ingeniero senior es una práctica reveladora. La herramienta es sumamente rápida para detectar violaciones a los principios SOLID y riesgos de seguridad que a simple vista se me pasaban. Sin embargo, me di cuenta de que no todas las sugerencias de la IA deben ser aceptadas a ciegas; a veces propone sobreingeniería o abstracciones innecesarias para el contexto actual. Documentar los hallazgos en `AI_CODE_REVIEW.md` me obligó a ser crítico, implementando solo las correcciones válidas y justificando mis rechazos, lo cual fortaleció mi propio criterio.
+
+### Prompts y Uso de IA
+Utilicé la IA para auditar la calidad del código y robustecer las pruebas:
+*   **Auditoría de Código:** Le pasé una clase importante y le pedí: *"Revisa esta clase como un ingeniero senior en un code review. Busca: violaciones de SOLID, casos borde sin manejar, riesgos de seguridad y problemas de rendimiento. Indica la línea y propón una corrección sin reescribir todo"*.
+*   **Descubrimiento de Huecos:** Le pedí que listara casos borde específicos que olvidé (valores nulos, límites numéricos, entradas malformadas) para revelar vulnerabilidades reales.
+*   **Generación de Pruebas:** A partir de los huecos revelados, le pedí ayuda para integrar al menos 5 tests nuevos al pipeline, cubriendo específicamente las entradas malformadas.
+
+### Reflexión
+> Aprender a recibir y filtrar críticas automatizadas sobre mi código cambió mi postura frente al desarrollo. Ya no se trata solo de que el código funcione, sino de entender por qué podría fallar bajo estrés. Defender mis decisiones y rechazar sugerencias de la IA con argumentos técnicos es un ejercicio excelente para dejar de ser solo un "escribidor de código" y pensar más como un arquitecto.
+
+---
+
+## [2026-08-06] — Entrada 3: Documentación asistida y mi primer ADR
+
+### Observaciones:
+Redactar un Architecture Decision Record (ADR) me pareció una herramienta fundamental para mantener un histórico del porqué se toman las decisiones en el proyecto de SensorHub. Apoyarme en la IA para generar el borrador a partir de mis notas aceleró mucho el proceso de creación del archivo `docs/adr/0001-arquitectura-en-capas.md`. Al aplicar el principio de Inversión de Dependencias (DIP) y estructurar en capas (routers -> services -> repositories -> models), noté que la cantidad de archivos y "ceremonia" crece, pero la recompensa es enorme: poder testear la lógica con repositorios falsos sin tocar la base de datos es invaluable.
+
+### Prompts y Uso de IA
+Utilicé la IA para estructurar documentación y comprender conceptos teóricos:
+*   **Redacción de ADR:** *"Tengo estas notas sobre separar el sistema en capas para aislar la base de datos. Redacta un borrador de un ADR documentando el contexto, la decisión técnica y las consecuencias (positivas y negativas)"*.
+*   **Revisión Teórica:** Le pedí que me explicara de forma concisa los conceptos clave de los artículos de Martin Fowler sobre *Microservices* y *MonolithFirst* para preparar mis notas de discusión, contrastándolos con la arquitectura que acabamos de definir.
+
+### Reflexión
+> Escribir mi primer ADR me hizo comprender que el código cuenta el "cómo", pero la documentación cuenta el "por qué". Separar la infraestructura de la lógica de negocio a través de abstracciones parecía mucho trabajo extra al principio, pero ver que ahora puedo cambiar de SQLite a PostgreSQL sin tocar un solo archivo de lógica de negocio justifica completamente el esfuerzo.
+
+---
+
+## [2026-08-07] — Entrada 4: Feature integrador — Detección y notificación de anomalías
+
+### Observaciones:
+El desarrollo de la feature de detección de anomalías fue el reto más grande porque combinó todo lo visto en la semana. Al implementar una lógica que evalúa las lecturas contra un umbral configurable, mantener el código limpio fue prioridad. Aplicar TDD estricto hizo que el desarrollo fuera más lento inicialmente, pero mucho más seguro. Además, implementar una estrategia de alerta intercambiable respetando el principio de Abierto/Cerrado (OCP) garantizó que en el futuro pueda agregar alertas por correo o SMS sin tener que modificar la clase principal del evaluador de anomalías.
+
+### Prompts y Uso de IA
+Utilicé la IA como un par en el flujo de trabajo guiado por pruebas:
+*   **Diseño de Arquitectura OCP:** *"¿Cómo puedo estructurar una estrategia de alerta intercambiable para cumplir con el principio OCP en un sistema que evalúa lecturas de sensores contra un umbral?"*
+*   **Desarrollo TDD:** *"Actúa como un desarrollador TDD. Escribe primero las pruebas que fallan para el evaluador de anomalías asumiendo un umbral inyectado, antes de escribir la implementación real."*
+*   **Refactorización:** *"Revisa mi implementación de la alerta y asegúrate de que esté completamente desacoplada de la lógica de lectura del sensor."*
+
+### Reflexión
+> Aplicar TDD estricto en una feature completa te obliga a diseñar el sistema desde la perspectiva de quien lo consume, no de quien lo construye. Combinar esto con el principio OCP me demostró que el buen código no es el que hace muchas cosas, sino el que está preparado para extenderse sin tener que abrirse y arriesgarse a romper lo que ya funciona.

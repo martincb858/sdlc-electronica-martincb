@@ -9,6 +9,7 @@ from app.domain.validators import (
 )
 from app.repositories.reading_repositorie import SqlAlchemyReadingRepository
 from app.repositories.sensor_repository import SqlAlchemySensorRepository
+from app.services.anomaly_detector_service import AnomalyDetectorService
 
 
 class SensorNotFoundError(Exception):
@@ -24,12 +25,14 @@ class ReadingService:
         physics_registry: ValidatorRegistry = physics_registry,
         operational_registry: ValidatorRegistry = operational_registry,
         sensor_type_registry: SensorTypeRegistry = sensor_type_registry,
+        anomaly_detector: AnomalyDetectorService | None = None,
     ) -> None:
         self._repo = repo
         self._sensor_repo = sensor_repo
         self._physics_registry = physics_registry
         self._operational_registry = operational_registry
         self._sensor_type_registry = sensor_type_registry
+        self._anomaly_detector = anomaly_detector
 
     def _validate_reading(self, sensor_id: str, value: float, unit: str) -> None:
 
@@ -56,7 +59,10 @@ class ReadingService:
     def record(self, sensor_id: str, value: float, unit: str) -> ReadingModel:
         unit = unit.upper()
         self._validate_reading(sensor_id, value, unit)
-        return self._repo.add(sensor_id, value, unit)
+        reading = self._repo.add(sensor_id, value, unit)
+        if self._anomaly_detector is not None:
+            self._anomaly_detector.process_reading(sensor_id, value)
+        return reading
 
     def get_history(
         self,

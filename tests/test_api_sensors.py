@@ -112,4 +112,5 @@ def test_openapi_schema_includes_sensor_and_reading_paths(client: TestClient) ->
     assert "/sensors" in paths
     assert "/sensors/{sensor_code}" in paths
     assert "/sensors/{sensor_code}/readings" in paths
+    assert "/sensors/{sensor_code}/alerts" in paths
     assert "/readings/{reading_id}" in paths

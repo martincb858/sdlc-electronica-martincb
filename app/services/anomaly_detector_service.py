@@ -15,7 +15,7 @@ class AnomalyDetectorService:
             self._alert_strategies: list[AlertStrategy] = list(alert_strategy)
         else:
             self._alert_strategies = [alert_strategy]
-        self._thresholds: dict[str, float] = thresholds or {}
+        self._thresholds = dict(thresholds) if thresholds else {}
 
     def process_reading(self, sensor_id: str, value: float) -> None:
         """Evalúa si el valor leído supera el umbral configurado y notifica."""

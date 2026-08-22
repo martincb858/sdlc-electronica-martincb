@@ -45,6 +45,8 @@ class SensorModel(Base):
     name: Mapped[str]
     sensor_type: Mapped[str] = mapped_column(index=True)
     location: Mapped[str | None] = mapped_column(default=None)
+    alert_threshold: Mapped[float | None] = mapped_column(default=None)
+    active: Mapped[bool] = mapped_column(default=True)
 
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc)
@@ -91,6 +93,7 @@ class AlertModel(Base):
     sensor_id: Mapped[str] = mapped_column(ForeignKey("sensors.code"), index=True)
     value: Mapped[float]
     threshold: Mapped[float]
+    status: Mapped[str] = mapped_column(default="open", index=True)
 
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc)
@@ -101,5 +104,6 @@ class AlertModel(Base):
     def __repr__(self) -> str:
         return (
             f"<Alert(id={self.id}, sensor='{self.sensor_id}', "
-            f"value={self.value}, threshold={self.threshold})>"
+            f"value={self.value}, threshold={self.threshold}, "
+            f"status='{self.status}')>"
         )

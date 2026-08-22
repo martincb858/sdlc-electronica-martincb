@@ -8,11 +8,20 @@ class SqlAlchemySensorRepository:
         self._db = db_session
 
     def add(
-        self, code: str, name: str, sensor_type: str, location: str | None
+        self,
+        code: str,
+        name: str,
+        sensor_type: str,
+        location: str | None,
+        alert_threshold: float | None = None,
     ) -> SensorModel:
 
         sensor = SensorModel(
-            code=code, name=name, sensor_type=sensor_type, location=location
+            code=code,
+            name=name,
+            sensor_type=sensor_type,
+            location=location,
+            alert_threshold=alert_threshold,
         )
 
         self._db.add(sensor)
@@ -29,7 +38,11 @@ class SqlAlchemySensorRepository:
         )
 
     def update(
-        self, code: str, name: str | None, location: str | None
+        self,
+        code: str,
+        name: str | None,
+        location: str | None,
+        alert_threshold: float | None = None,
     ) -> SensorModel | None:
 
         sensor = self.get_by_code(code)
@@ -40,15 +53,23 @@ class SqlAlchemySensorRepository:
             sensor.name = name
         if location is not None:
             sensor.location = location
+        if alert_threshold is not None:
+            sensor.alert_threshold = alert_threshold
 
         self._db.commit()
         self._db.refresh(sensor)
         return sensor
 
-    def delete(self, code: str) -> bool:
+    def count_total(self) -> int:
+        return self._db.query(SensorModel).count()
+
+    def count_active(self) -> int:
+        return self._db.query(SensorModel).filter(SensorModel.active.is_(True)).count()
+
+    def deactivate(self, code: str) -> bool:
         sensor = self.get_by_code(code)
         if not sensor:
             return False
-        self._db.delete(sensor)
+        sensor.active = False
         self._db.commit()
         return True

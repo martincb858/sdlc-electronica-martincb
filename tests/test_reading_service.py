@@ -1,9 +1,15 @@
 from datetime import datetime, timedelta, timezone
+from unittest.mock import Mock
 
 import pytest
 
 from app.db import ReadingModel, SensorModel
-from app.services.reading_service import ReadingService, SensorNotFoundError
+from app.services.anomaly_detector_service import AnomalyDetectorService
+from app.services.reading_service import (
+    ReadingService,
+    SensorInactiveError,
+    SensorNotFoundError,
+)
 from app.services.sensor_service import SensorService
 
 
@@ -135,6 +141,62 @@ def test_service_update_reading_no_changes(
 def test_service_delete_nonexistent_reading(reading_service: ReadingService) -> None:
     result = reading_service.delete_reading(999)
     assert result is False
+
+
+def test_service_rejects_reading_for_inactive_sensor(
+    reading_service: ReadingService,
+    sensor_service: SensorService,
+) -> None:
+    sensor_service.register("TEMP-01", "Sensor sala A", "TEMPERATURE", None)
+    sensor_service.delete_sensor("TEMP-01")
+
+    with pytest.raises(SensorInactiveError, match="TEMP-01"):
+        reading_service.record("TEMP-01", 20.0, "C")
+
+
+def test_record_triggers_anomaly_detector_with_sensor_threshold(
+    reading_repo, sensor_repo
+) -> None:
+    sensor_service = SensorService(sensor_repo)
+    sensor_service.register(
+        "TEMP-01", "Sensor sala A", "TEMPERATURE", None, alert_threshold=30.0
+    )
+
+    detector = Mock(spec=AnomalyDetectorService)
+    service = ReadingService(reading_repo, sensor_repo, anomaly_detector=detector)
+
+    service.record("TEMP-01", 35.0, "C")
+
+    detector.process_reading.assert_called_once_with("TEMP-01", 35.0, 30.0)
+
+
+def test_get_stats_computes_min_max_average(
+    reading_service: ReadingService, temp_sensor: ReadingModel
+) -> None:
+    reading_service.record("TEMP-01", 10.0, "C")
+    reading_service.record("TEMP-01", 20.0, "C")
+    reading_service.record("TEMP-01", 30.0, "C")
+
+    stats = reading_service.get_stats("TEMP-01")
+
+    assert stats.count == 3
+    assert stats.minimum == 10.0
+    assert stats.maximum == 30.0
+    assert stats.average == 20.0
+
+
+def test_get_stats_raises_sensor_not_found(reading_service: ReadingService) -> None:
+    with pytest.raises(SensorNotFoundError, match="NOPE"):
+        reading_service.get_stats("NOPE")
+
+
+def test_get_stats_with_no_readings_returns_zero_count(
+    reading_service: ReadingService, temp_sensor: ReadingModel
+) -> None:
+    stats = reading_service.get_stats("TEMP-01")
+
+    assert stats.count == 0
+    assert stats.minimum is None
 
 
 def test_reading_model_repr() -> None:

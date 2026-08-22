@@ -165,3 +165,34 @@ def test_openapi_documents_error_responses_for_reading_endpoints(
 
     delete_responses = paths["/readings/{reading_id}"]["delete"]["responses"]
     assert "404" in delete_responses
+
+
+def test_get_sensor_stats_returns_min_max_average(client: TestClient) -> None:
+    _create_sensor(client)
+    client.post("/sensors/TEMP-01/readings", json={"value": 10.0, "unit": "C"})
+    client.post("/sensors/TEMP-01/readings", json={"value": 20.0, "unit": "C"})
+    client.post("/sensors/TEMP-01/readings", json={"value": 30.0, "unit": "C"})
+
+    response = client.get("/sensors/TEMP-01/stats")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["sensor_id"] == "TEMP-01"
+    assert body["count"] == 3
+    assert body["minimum"] == 10.0
+    assert body["maximum"] == 30.0
+    assert body["average"] == 20.0
+
+
+def test_get_sensor_stats_returns_404_for_unknown_sensor(client: TestClient) -> None:
+    response = client.get("/sensors/NOPE/stats")
+    assert response.status_code == 404
+
+
+def test_get_sensor_stats_with_no_readings(client: TestClient) -> None:
+    _create_sensor(client)
+
+    response = client.get("/sensors/TEMP-01/stats")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["count"] == 0
+    assert body["minimum"] is None

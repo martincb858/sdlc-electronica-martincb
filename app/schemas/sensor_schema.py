@@ -20,6 +20,11 @@ class SensorCreate(BaseModel):
         examples=["TEMPERATURE"],
     )
     location: str | None = Field(default=None, examples=["Sala A"])
+    alert_threshold: float | None = Field(
+        default=None,
+        description="Umbral a partir del cual una lectura genera una alerta",
+        examples=[35.0],
+    )
 
     @field_validator("code")
     @classmethod
@@ -36,6 +41,7 @@ class SensorCreate(BaseModel):
 class SensorUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1)
     location: str | None = Field(default=None)
+    alert_threshold: float | None = Field(default=None)
 
 
 class SensorOut(BaseModel):
@@ -44,5 +50,7 @@ class SensorOut(BaseModel):
     name: str
     sensor_type: str
     location: str | None
+    alert_threshold: float | None
+    active: bool
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)

@@ -11,13 +11,18 @@ class SensorService:
         self._repo = repo
 
     def register(
-        self, code: str, name: str, sensor_type: str, location: str | None
+        self,
+        code: str,
+        name: str,
+        sensor_type: str,
+        location: str | None,
+        alert_threshold: float | None = None,
     ) -> SensorModel:
         if self._repo.get_by_code(code) is not None:
             raise SensorAlreadyExistsError(
                 f"Ya existe un sensor registrado con code '{code}'."
             )
-        return self._repo.add(code, name, sensor_type, location)
+        return self._repo.add(code, name, sensor_type, location, alert_threshold)
 
     def list_sensors(self, limit: int = 50, offset: int = 0) -> list[SensorModel]:
         return self._repo.list_all(limit, offset)
@@ -26,9 +31,15 @@ class SensorService:
         return self._repo.get_by_code(code)
 
     def update_sensor(
-        self, code: str, name: str | None, location: str | None
+        self,
+        code: str,
+        name: str | None,
+        location: str | None,
+        alert_threshold: float | None = None,
     ) -> SensorModel | None:
-        return self._repo.update(code, name, location)
+        return self._repo.update(code, name, location, alert_threshold)
 
     def delete_sensor(self, code: str) -> bool:
-        return self._repo.delete(code)
+        """Desactiva el sensor (soft-delete). Su historico sigue consultable
+        pero deja de aceptar lecturas nuevas."""
+        return self._repo.deactivate(code)

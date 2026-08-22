@@ -53,11 +53,37 @@ def test_update_sensor_returns_none_if_missing(sensor_service: SensorService) ->
     assert sensor_service.update_sensor("NOPE", "X", None) is None
 
 
-def test_delete_sensor_removes_it(sensor_service: SensorService) -> None:
+def test_delete_sensor_deactivates_it_instead_of_removing(
+    sensor_service: SensorService,
+) -> None:
     sensor_service.register("TEMP-01", "A", "TEMPERATURE", None)
     assert sensor_service.delete_sensor("TEMP-01") is True
-    assert sensor_service.get_sensor("TEMP-01") is None
+
+    sensor = sensor_service.get_sensor("TEMP-01")
+    assert sensor is not None
+    assert sensor.active is False
 
 
 def test_delete_sensor_returns_false_if_missing(sensor_service: SensorService) -> None:
     assert sensor_service.delete_sensor("NOPE") is False
+
+
+def test_register_accepts_alert_threshold(sensor_service: SensorService) -> None:
+    sensor = sensor_service.register(
+        "TEMP-01", "A", "TEMPERATURE", None, alert_threshold=35.0
+    )
+    assert sensor.alert_threshold == 35.0
+
+
+def test_new_sensor_is_active_by_default(sensor_service: SensorService) -> None:
+    sensor = sensor_service.register("TEMP-01", "A", "TEMPERATURE", None)
+    assert sensor.active is True
+
+
+def test_update_sensor_changes_alert_threshold(sensor_service: SensorService) -> None:
+    sensor_service.register("TEMP-01", "A", "TEMPERATURE", None, alert_threshold=30.0)
+    updated = sensor_service.update_sensor(
+        "TEMP-01", name=None, location=None, alert_threshold=40.0
+    )
+    assert updated is not None
+    assert updated.alert_threshold == 40.0

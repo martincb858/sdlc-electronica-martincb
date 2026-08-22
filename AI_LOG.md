@@ -1,7 +1,7 @@
-# Bitácora de Inteligencia Artificial - Semana 3
+# Bitácora de Inteligencia Artificial — SensorHub
 ---
 
-Esta bitácora documenta el proceso de aprendizaje, los desafíos técnicos y la integración de herramientas de Inteligencia Artificial durante la tercera semana de desarrollo, enfocada en la persistencia de datos, arquitectura de software y desarrollo de APIs.
+Esta bitácora documenta el proceso de aprendizaje, los desafíos técnicos y la integración de herramientas de Inteligencia Artificial a lo largo de todo el desarrollo de SensorHub, desde la persistencia de datos y la arquitectura en capas (semana 3) hasta el proyecto final integrador (semana 6).
 
 ---
 
@@ -161,3 +161,27 @@ Mi uso de la IA se centró en la validación final de los entregables y la resol
 
 ### Reflexión
 > Ver la evaluación integrada de esta manera me dio una perspectiva profesional del ciclo de vida del software. No se trata solo de escribir código que funcione en local, sino de asegurar la reproducibilidad con Docker, la integridad con las migraciones y pruebas, y la automatización total con CI/CD y despliegue continuo. Superar esta evaluación con una URL pública funcional y un pipeline en verde consolidó todo lo aprendido en una solución robusta y lista para producción.
+
+---
+
+## [2026-08-21] — Entrada 6: Semana 6 — Proyecto final, auditoría y cierre de brechas funcionales
+
+### Lo que aprendí e Implementaciones
+Arranqué la semana final pidiéndole a la IA (Claude Code) una auditoría completa del estado del proyecto contra los siete requisitos funcionales y seis no funcionales de la consigna, en vez de asumir que lo construido en semanas anteriores ya los cubría. Esa auditoría encontró dos problemas reales que no eran evidentes con solo mirar la cobertura de tests (que ya estaba en ~96%):
+
+1. **La detección de anomalías (RF-4) nunca se ejecutaba en producción.** `AnomalyDetectorService` se armaba en `dependencies.py` sin pasarle nunca los umbrales, así que ninguna lectura disparaba una alerta real, aunque los tests unitarios del servicio (que sí pasaban un diccionario a mano) daban una falsa sensación de que todo funcionaba.
+2. **La tabla `alerts` no tenía migración de Alembic.** El modelo existía en `db.py` desde la semana anterior, pero nunca se generó el `alembic revision --autogenerate` correspondiente — en Postgres de producción esa tabla probablemente no existía.
+
+A partir de ahí, con TDD (test en rojo antes de implementar) fui cerrando brecha por brecha: umbral de alerta como campo real del sensor, soft-delete verdadero (antes `DELETE` borraba la fila; ahora desactiva y el histórico sigue consultable), una máquina de estados para alertas (`open -> acknowledged -> resolved`) en un módulo de dominio puro, estadísticas por sensor (RF-6), un endpoint de métricas (RF-7), logging estructurado en JSON y un manejo global de errores que evita filtrar tracebacks al cliente.
+
+### Prompts y Uso de IA
+Esta fue la sesión donde más delegué en la IA, de forma consciente y con revisión activa, dado el tiempo limitado (una noche) para llegar a un nivel "competente+":
+* **Auditoría de brechas:** le pedí que relevara el código real (routers, services, repos, migraciones, CI) contra cada RF/RNF de la consigna, no que asumiera nada del `CLAUDE.md` sin verificarlo — así se detectó que el soft-delete que el propio `CLAUDE.md` documentaba como implementado en realidad no lo estaba.
+* **TDD guiado:** para cada pieza de lógica nueva (máquina de estados de alertas, cálculo de estadísticas, umbral de anomalías) le pedí escribir el test primero, confirmar que fallaba, y recién ahí implementar.
+* **Generación y revisión de migración Alembic:** le pedí generar la migración faltante con `--autogenerate` contra una base SQLite limpia, y revisé a mano que la columna `active` (NOT NULL) tuviera `server_default` para no romper filas ya existentes en Postgres.
+* **Redacción de ADR:** le pedí documentar la decisión de rediseñar `AnomalyDetectorService` (de diccionario en memoria a parámetro explícito) como ADR, incluyendo el porqué del bug original.
+
+### Reflexión
+> La lección más grande de esta noche no fue técnica sino de proceso: tener 96% de cobertura de tests no significa que el sistema funcione — significa que el código que se escribió hace lo que sus propios tests dicen que debe hacer. El bug del umbral de anomalías pasó todos los tests unitarios porque esos tests nunca ejercitaban el camino real de inyección de dependencias, solo el servicio aislado con datos armados a mano. Delegar la *auditoría* a la IA, y no solo la implementación, fue lo que expuso ese hueco. Queda como tarea personal revisar con calma — después de la entrega — cada decisión de diseño tomada esta noche bajo presión de tiempo, en particular si la máquina de estados de alertas necesita quedar auditada (quién y cuándo cambió el estado) a futuro.
+
+*(Nota: esta entrada fue redactada junto con Claude Code documentando fielmente lo ocurrido en la sesión; quedó pendiente de mi revisión final antes de la entrega para asegurar que refleje mi propia voz y aprendizaje.)*

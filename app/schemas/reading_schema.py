@@ -39,3 +39,11 @@ class ReadingOut(BaseModel):
     unit: str
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+
+class StatsOut(BaseModel):
+    sensor_id: str
+    count: int
+    minimum: float | None
+    maximum: float | None
+    average: float | None

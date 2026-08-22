@@ -13,36 +13,27 @@ from app.services.anomaly_detector_service import AnomalyDetectorService
 
 def test_process_reading_triggers_alert_when_value_exceeds_threshold() -> None:
     mock_strategy = Mock(spec=AlertStrategy)
-    thresholds = {"TEMP-01": 30.0}
-    service = AnomalyDetectorService(
-        alert_strategy=mock_strategy, thresholds=thresholds
-    )
+    service = AnomalyDetectorService(alert_strategy=mock_strategy)
 
-    service.process_reading("TEMP-01", 35.5)
+    service.process_reading("TEMP-01", 35.5, threshold=30.0)
 
     mock_strategy.notify.assert_called_once_with("TEMP-01", 35.5, 30.0)
 
 
 def test_process_reading_does_not_trigger_alert_when_value_below_threshold() -> None:
     mock_strategy = Mock(spec=AlertStrategy)
-    thresholds = {"TEMP-01": 30.0}
-    service = AnomalyDetectorService(
-        alert_strategy=mock_strategy, thresholds=thresholds
-    )
+    service = AnomalyDetectorService(alert_strategy=mock_strategy)
 
-    service.process_reading("TEMP-01", 25.0)
+    service.process_reading("TEMP-01", 25.0, threshold=30.0)
 
     mock_strategy.notify.assert_not_called()
 
 
 def test_process_reading_does_not_trigger_alert_when_value_equals_threshold() -> None:
     mock_strategy = Mock(spec=AlertStrategy)
-    thresholds = {"TEMP-01": 30.0}
-    service = AnomalyDetectorService(
-        alert_strategy=mock_strategy, thresholds=thresholds
-    )
+    service = AnomalyDetectorService(alert_strategy=mock_strategy)
 
-    service.process_reading("TEMP-01", 30.0)
+    service.process_reading("TEMP-01", 30.0, threshold=30.0)
 
     mock_strategy.notify.assert_not_called()
 
@@ -50,13 +41,11 @@ def test_process_reading_does_not_trigger_alert_when_value_equals_threshold() ->
 def test_process_reading_with_multiple_strategies() -> None:
     mock_strategy_1 = Mock(spec=AlertStrategy)
     mock_strategy_2 = Mock(spec=AlertStrategy)
-    thresholds = {"TEMP-01": 20.0}
     service = AnomalyDetectorService(
         alert_strategy=[mock_strategy_1, mock_strategy_2],
-        thresholds=thresholds,
     )
 
-    service.process_reading("TEMP-01", 25.0)
+    service.process_reading("TEMP-01", 25.0, threshold=20.0)
 
     mock_strategy_1.notify.assert_called_once_with("TEMP-01", 25.0, 20.0)
     mock_strategy_2.notify.assert_called_once_with("TEMP-01", 25.0, 20.0)
@@ -64,12 +53,9 @@ def test_process_reading_with_multiple_strategies() -> None:
 
 def test_process_reading_ignores_sensors_without_threshold() -> None:
     mock_strategy = Mock(spec=AlertStrategy)
-    thresholds = {"TEMP-01": 30.0}
-    service = AnomalyDetectorService(
-        alert_strategy=mock_strategy, thresholds=thresholds
-    )
+    service = AnomalyDetectorService(alert_strategy=mock_strategy)
 
-    service.process_reading("HUM-01", 80.0)
+    service.process_reading("HUM-01", 80.0, threshold=None)
 
     mock_strategy.notify.assert_not_called()
 

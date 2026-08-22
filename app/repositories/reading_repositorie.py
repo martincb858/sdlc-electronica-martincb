@@ -36,6 +36,26 @@ class SqlAlchemyReadingRepository:
 
         return query.offset(offset).limit(limit).all()
 
+    def list_values_for_sensor(
+        self,
+        sensor_id: str,
+        from_date: datetime | None,
+        to_date: datetime | None,
+    ) -> list[float]:
+
+        query = self._db.query(ReadingModel.value).filter(
+            ReadingModel.sensor_id == sensor_id
+        )
+        if from_date:
+            query = query.filter(ReadingModel.created_at >= from_date)
+        if to_date:
+            query = query.filter(ReadingModel.created_at <= to_date)
+
+        return [row[0] for row in query.all()]
+
+    def count_total(self) -> int:
+        return self._db.query(ReadingModel).count()
+
     def get_by_id(self, reading_id: int) -> ReadingModel | None:
         return (
             self._db.query(ReadingModel).filter(ReadingModel.id == reading_id).first()

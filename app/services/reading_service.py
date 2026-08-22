@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from app.db import ReadingModel
+from app.db import ReadingModel, SensorModel
 from app.domain.sensor_types import SensorTypeRegistry, sensor_type_registry
+from app.domain.stats import ReadingStats, compute_stats
 from app.domain.validators import (
     ValidatorRegistry,
     operational_registry,
@@ -15,6 +16,10 @@ from app.services.anomaly_detector_service import AnomalyDetectorService
 class SensorNotFoundError(Exception):
     """Se lanza al referenciar un sensor que no existe (al crear o actualizar
     una lectura)."""
+
+
+class SensorInactiveError(Exception):
+    """Se lanza al intentar registrar una lectura en un sensor desactivado."""
 
 
 class ReadingService:
@@ -34,11 +39,18 @@ class ReadingService:
         self._sensor_type_registry = sensor_type_registry
         self._anomaly_detector = anomaly_detector
 
-    def _validate_reading(self, sensor_id: str, value: float, unit: str) -> None:
+    def _validate_reading(
+        self, sensor_id: str, value: float, unit: str, *, require_active: bool = False
+    ) -> SensorModel:
 
         sensor = self._sensor_repo.get_by_code(sensor_id)
         if sensor is None:
             raise SensorNotFoundError(f"Sensor '{sensor_id}' no encontrado.")
+
+        if require_active and not sensor.active:
+            raise SensorInactiveError(
+                f"Sensor '{sensor_id}' esta inactivo y no acepta lecturas nuevas."
+            )
 
         type_spec = self._sensor_type_registry.get_optional(sensor.sensor_type)
         if type_spec is not None and unit not in type_spec.accepted_units:
@@ -56,12 +68,16 @@ class ReadingService:
         if physics_validator is not None:
             physics_validator.validate(value)
 
+        return sensor
+
     def record(self, sensor_id: str, value: float, unit: str) -> ReadingModel:
         unit = unit.upper()
-        self._validate_reading(sensor_id, value, unit)
+        sensor = self._validate_reading(sensor_id, value, unit, require_active=True)
         reading = self._repo.add(sensor_id, value, unit)
         if self._anomaly_detector is not None:
-            self._anomaly_detector.process_reading(sensor_id, value)
+            self._anomaly_detector.process_reading(
+                sensor_id, value, sensor.alert_threshold
+            )
         return reading
 
     def get_history(
@@ -77,6 +93,19 @@ class ReadingService:
             raise SensorNotFoundError(f"Sensor '{sensor_id}' no encontrado.")
 
         return self._repo.list_for_sensor(sensor_id, limit, offset, from_date, to_date)
+
+    def get_stats(
+        self,
+        sensor_id: str,
+        from_date: datetime | None = None,
+        to_date: datetime | None = None,
+    ) -> ReadingStats:
+
+        if self._sensor_repo.get_by_code(sensor_id) is None:
+            raise SensorNotFoundError(f"Sensor '{sensor_id}' no encontrado.")
+
+        values = self._repo.list_values_for_sensor(sensor_id, from_date, to_date)
+        return compute_stats(values)
 
     def get_reading(self, reading_id: int) -> ReadingModel | None:
         return self._repo.get_by_id(reading_id)

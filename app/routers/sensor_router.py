@@ -24,7 +24,11 @@ def create_sensor(
 ) -> SensorModel:
     try:
         return service.register(
-            sensor.code, sensor.name, sensor.sensor_type, sensor.location
+            sensor.code,
+            sensor.name,
+            sensor.sensor_type,
+            sensor.location,
+            sensor.alert_threshold,
         )
     except SensorAlreadyExistsError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
@@ -53,7 +57,10 @@ def update_sensor(
     service: SensorService = Depends(get_sensor_service),
 ) -> SensorModel:
     updated = service.update_sensor(
-        sensor_code, sensor_update.name, sensor_update.location
+        sensor_code,
+        sensor_update.name,
+        sensor_update.location,
+        sensor_update.alert_threshold,
     )
     if not updated:
         raise HTTPException(

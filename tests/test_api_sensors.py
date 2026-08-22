@@ -92,12 +92,46 @@ def test_delete_sensor_returns_204(client: TestClient) -> None:
 
     response = client.delete("/sensors/TEMP-01")
     assert response.status_code == 204
-    assert client.get("/sensors/TEMP-01").status_code == 404
+
+
+def test_delete_sensor_deactivates_but_keeps_it_queryable(client: TestClient) -> None:
+    _create_sensor(client)
+    client.delete("/sensors/TEMP-01")
+
+    response = client.get("/sensors/TEMP-01")
+    assert response.status_code == 200
+    assert response.json()["active"] is False
 
 
 def test_delete_sensor_returns_404_if_missing(client: TestClient) -> None:
     response = client.delete("/sensors/NOPE")
     assert response.status_code == 404
+
+
+def test_inactive_sensor_rejects_new_readings(client: TestClient) -> None:
+    _create_sensor(client)
+    client.delete("/sensors/TEMP-01")
+
+    response = client.post(
+        "/sensors/TEMP-01/readings", json={"value": 20.0, "unit": "C"}
+    )
+    assert response.status_code == 409
+
+
+def test_create_sensor_accepts_alert_threshold(client: TestClient) -> None:
+    response = client.post(
+        "/sensors",
+        json={
+            "code": "TEMP-01",
+            "name": "X",
+            "sensor_type": "TEMPERATURE",
+            "alert_threshold": 35.0,
+        },
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["alert_threshold"] == 35.0
+    assert body["active"] is True
 
 
 def test_swagger_docs_are_served(client: TestClient) -> None:
